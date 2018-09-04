@@ -163,5 +163,6 @@
 		<module>pi-user-center</module>
 		<module>pi-web</module>
 		<module>pi-open-http</module>
+		<module>pi-automatic-tool</module>
 	</modules>
 </project>
