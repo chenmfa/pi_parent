@@ -39,7 +39,7 @@ public class FieldModel {
 		}
 		sb.append(name+";");
 		
-		for(int i=1; i<41-name.length(); i++) {
+		for(int i=1; i<20-name.length(); i++) {
 			sb.append(" ");
 		}
 		sb.append("// "+comment+" \n");

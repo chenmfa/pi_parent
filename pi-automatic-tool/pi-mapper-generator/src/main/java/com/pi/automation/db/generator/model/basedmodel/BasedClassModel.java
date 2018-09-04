@@ -1,11 +1,15 @@
-package com.pi.automation.db.generator.model;
+package com.pi.automation.db.generator.model.basedmodel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
-public class ClassModel {
+import com.pi.automation.db.generator.model.FieldModel;
+import com.pi.automation.db.generator.model.MethodModel;
+
+public class BasedClassModel {
 
 	private String className;
 	private String packageName;
@@ -14,7 +18,7 @@ public class ClassModel {
 	private List<FieldModel> fields = new ArrayList<>();
 	private String tableName;
 
-	public ClassModel(String className, String packageName, String tableName) {
+	public BasedClassModel(String className, String packageName, String tableName) {
 		super();
 		this.className = className;
 		this.packageName = packageName;
@@ -66,6 +70,7 @@ public class ClassModel {
 		
 		StringBuilder sb = new StringBuilder(500);
 		sb.append("package " + packageName + ";\n\n");
+		sb.append("import com.pi.comm.entity.BaseEntity;\n\n");
 		if(hasDate){
 			sb.append("import java.util.Date;\n\n");
 		}
@@ -73,7 +78,8 @@ public class ClassModel {
 			sb.append("import java.math.BigDecimal;\n\n");
 		}
 		sb.append(comment);
-		sb.append("public class " + className + "{\n");
+		sb.append("public class " + className + " extends BaseEntity{\n");
+		sb.append("\tprivate static final long serialVersionUID = " + new Random(10).nextLong() + "L;\r\n");
 		for (FieldModel f : fields) {
 			sb.append(f.toString());
 		}

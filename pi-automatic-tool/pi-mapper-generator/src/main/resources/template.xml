@@ -27,19 +27,61 @@ ${whereSet}
 		<include refid="table_name" />
 		where id=#{id}
 	</select>
+  <select id="findAll" resultMap="${resultMapId}">
+    SELECT
+    <include refid="all_columns" />
+    <include refid="table_name" /> limit 1000
+  </select>
+  <select id="findList" resultMap="${resultMapId}">
+    select <include refid="all_columns" /> from <include refid="table_name" /> <include refid="where" />
+  </select>
+  
+    
 	<update id="updateById" parameterType="${entityFullClassName}">
 		update <include refid="table_name" />
 		set ${updatePrefix} <include refid="updateSet" />
 		where ID=#{id} AND VERSION=#{version}
 	</update>
 	
-	<insert id="insertEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="${entityFullClassName}">
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="${entityFullClassName}">
 		insert into <include refid="table_name" />
 		(<include refid="all_columns" />)
 		values( ${insertValues} )
 	</insert>
-		
-	<select id="findByParam" resultMap="${resultMapId}">
-		select <include refid="all_columns" /> from	<include refid="table_name" /> <include refid="where" />
-	</select>
+
+  <select id="count" resultType="long">
+    SELECT count(1) FROM <include refid="table_name" />
+  </select>
+  <select id="countList" resultType="long">
+    SELECT count(1) FROM <include refid="table_name" />
+    <include refid="where" />
+  </select>	
+  <select id="getByIds" parameterType="list" resultType="${resultMapId}">
+    SELECT
+    <include refid="all_columns" />
+    FROM <include refid="table_name" />
+    <where>
+      ID in
+      <foreach item="item" index="index" collection="list" open="("
+           separator="," close=")">
+        #{item}
+      </foreach>
+    </where>
+  </select>
+  
+	<delete id="delete" parameterType="long">
+	  DELETE FROM <include refid="table_name" />
+	  WHERE ID=#{id}
+	</delete>
+  <delete id="deleteByIds">
+    DELETE FROM <include refid="table_name" />
+    <where>
+      ID in
+      <foreach item="item" index="index" collection="list" open="("
+           separator="," close=")">
+        #{item}
+      </foreach>
+    </where>
+  </delete>
 </mapper>

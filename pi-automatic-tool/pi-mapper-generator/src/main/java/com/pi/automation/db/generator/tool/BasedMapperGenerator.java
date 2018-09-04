@@ -1,4 +1,4 @@
-package com.pi.automation.db.generator;
+package com.pi.automation.db.generator.tool;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,11 +15,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 
-import com.pi.automation.db.generator.model.ClassModel;
 import com.pi.automation.db.generator.model.ColumnModel;
 import com.pi.automation.db.generator.model.FieldModel;
-import com.pi.automation.db.generator.model.MapperModel;
 import com.pi.automation.db.generator.model.MethodModel;
+import com.pi.automation.db.generator.model.basedmodel.BasedClassModel;
+import com.pi.automation.db.generator.model.basedmodel.BasedMapperModel;
+import com.pi.automation.db.generator.model.basedmodel.BasedParamModel;
 import com.pi.automation.db.generator.util.TemplateUtil;
 
 /**
@@ -27,24 +28,24 @@ import com.pi.automation.db.generator.util.TemplateUtil;
  * @author com.liulutu.liugang.db.mapper(改编自这个模板)
  * @updateby chenmfa
  */
-public class MapperGenerator {
+public class BasedMapperGenerator {
 
 
 	public void generate(String databaseName, String tableName, String superPackageName)
 			throws Exception {
 		System.out.println("读取配置中...");
 		Properties datasource = new Properties();
-		try (InputStream resourceAsStream = MapperGenerator.class
+		try (InputStream resourceAsStream = BasedMapperGenerator.class
 				.getResourceAsStream("/datasource.properties");) {
 			datasource.load(resourceAsStream);
 		}
 		Properties types = new Properties();
-		try (InputStream resourceAsStream = MapperGenerator.class
+		try (InputStream resourceAsStream = BasedMapperGenerator.class
 				.getResourceAsStream("/type.properties");) {
 			types.load(resourceAsStream);
 		}
 		String mapperTemplate = "";
-		try (InputStream is = MapperGenerator.class
+		try (InputStream is = BasedMapperGenerator.class
 				.getResourceAsStream("/template.xml");
 				Scanner scanner = new Scanner(is, "UTF-8");) {
 			mapperTemplate = scanner.useDelimiter("\\A").next();
@@ -81,17 +82,17 @@ public class MapperGenerator {
 			throws Exception {
 		String className = normalizeClass(tableName);
 		
-		ClassModel entityClass = new ClassModel(className + "Entity",
+		BasedClassModel entityClass = new BasedClassModel(className + "Entity",
 				superPackageName + ".entity", tableName);
 		String entityClassFullName = entityClass.getPackageName() + "."
 				+ entityClass.getClassName();
 		
-		ClassModel paramClass = new ClassModel(className + "Param",
+		BasedParamModel paramClass = new BasedParamModel(className + "Param",
 				superPackageName + ".param", tableName);
 		String paramClassFullName = paramClass.getPackageName() + "."
 				+ paramClass.getClassName();
 		
-		MapperModel mapperClass = new MapperModel(className
+		BasedMapperModel mapperClass = new BasedMapperModel(className
 				+ "Mapper", superPackageName + ".mapper",
 				entityClass.getClassName(), entityClassFullName, tableName, paramClass.getClassName(), paramClassFullName);
 		String mapperClassFullName = mapperClass.getPackageName() + "."
@@ -131,14 +132,6 @@ public class MapperGenerator {
 			MethodModel getMethod = new MethodModel(type,
 					normalizeGetMethod(name), name, true);
 			
-			entityClass.addField(field);
-			entityClass.addMethod(getMethod);
-			entityClass.addMethod(setMethod);
-			
-			paramClass.addField(field);
-			paramClass.addMethod(getMethod);
-			paramClass.addMethod(setMethod);
-
 			resultMap.append("\t\t<result column=\"" + columnName
 					+ "\" property=\"" + name + "\" />\n");
 
@@ -149,6 +142,15 @@ public class MapperGenerator {
 			if("id".equals(name) || "createDate".equals(name) || "updateDate".equals(name) || "version".equals(name)){
 				continue;
 			}
+			
+	    entityClass.addField(field);
+      entityClass.addMethod(getMethod);
+      entityClass.addMethod(setMethod);
+      
+      paramClass.addField(field);
+      paramClass.addMethod(getMethod);
+      paramClass.addMethod(setMethod);
+	      
 			updateSet.append("\t\t<if test=\""+name+" != null \">,"+columnName+"=#{"+name+"}"+"</if>\n");
 			
 			insertContent.append(",#{"+name+"}");
@@ -180,8 +182,8 @@ public class MapperGenerator {
 		saveAll(entityClass, paramClass, mapperClass, className, TemplateUtil.replace(mapperTemplate, map));
 	}
 
-	private void saveAll(ClassModel entityClass, ClassModel paramClass,
-			MapperModel mapperClass, String tableName,
+	private void saveAll(BasedClassModel entityClass, BasedParamModel paramClass,
+			BasedMapperModel mapperClass, String tableName,
 			String mapperContent) throws IOException {
 		new File("output/param").mkdirs();
 		new File("output/entity").mkdirs();
