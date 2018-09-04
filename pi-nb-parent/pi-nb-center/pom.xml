@@ -133,7 +133,7 @@
         <directory>src/main/resources</directory>  
       </resource>  
     </resources>
-    
+    <!-- 
     <pluginManagement>  
       <plugins>  
         <plugin>  
@@ -162,12 +162,14 @@
         </plugin>  
       </plugins>  
     </pluginManagement>
-    
+    -->
+    <!-- maven-jar-plugin-->
+    <!-- maven-dependency-plugin -->
 		<plugins>
 			<plugin>
 			  <groupId>org.springframework.boot</groupId>
 			  <artifactId>spring-boot-maven-plugin</artifactId>
-			  <version>${spring.boot.version}</version>
+			  <version>${spring.parent.version}</version>
 			  <configuration>
 			    <executable>true</executable>
 			    <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
@@ -205,56 +207,7 @@
             </goals>  
 	        </execution>
 		    </executions> 
-			</plugin>		
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId> 
-			   <artifactId>maven-jar-plugin</artifactId>  
-			   <version>2.1</version>  
-			   <configuration>  
-		        <!--<attach>true</attach>-->
-		        <jarName>nbcenter-RELEASE</jarName>
-			 			<archive>
-			 				<manifest>
-			 					<addClasspath>true</addClasspath>
-			 					<mainClass>com.pi.DeviceCenterBoot</mainClass>
-			 					<classpathPrefix>dependency/</classpathPrefix>
-			 				</manifest>
-			 			</archive> 
-			   </configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId> 
-			   <artifactId>maven-dependency-plugin</artifactId>  
-			   <version>2.1</version>  
-			   <configuration>  
-		       <attach>true</attach>
-			   </configuration>
-			   <executions>  
-	        <execution>
-        		<id>copy-dependencies</id> 
-            <phase>package</phase>  
-            <goals>  
-                <goal>copy-dependencies</goal>  
-            </goals>  
-	        </execution>  
-		    </executions>			   
-			</plugin>			 
-			<!-- maven 的打包源码的插件 -->
-			<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
-        <configuration>
-          <verbose>true</verbose>
-          <fork>true</fork>        
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-					<charset>UTF-8</charset>
-					<docencoding>UTF-8</docencoding>
-          <!--<executable>${JAVA_HOME}/bin/javac</executable>-->
-          <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>          
-        </configuration>
-      </plugin>
-		</plugins>		
+		</plugins>
   </build>
 </project>

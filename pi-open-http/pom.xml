@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -6,18 +6,13 @@
     <artifactId>pi-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>nb-parent</artifactId>
+  <artifactId>pi-open-http</artifactId>
   <packaging>pom</packaging>
 	<properties>
 		<pi.util.version>1.0.0-SNAPSHOT</pi.util.version><!-- 设备中心使用的util版本 -->
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-		
-
-		</dependencies>
-	</dependencyManagement>
   <modules>
-  	<module>pi-nb-center</module>	
+  	<module>pi-admin-web</module>
+  	<module>pi-stroop-web</module>	
   </modules>
 </project>
