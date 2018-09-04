@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pi.nbcenter.device.mapper.auto.IotDeviceInfoMapper">
+  <resultMap id="BaseResultMap" type="com.pi.nbcenter.device.entity.auto.IotDeviceInfo">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="iot_dev_id" jdbcType="VARCHAR" property="iotDevId" />
+    <result column="nb_dev_id" jdbcType="VARCHAR" property="nbDevId" />
+    <result column="partner_code" jdbcType="BIGINT" property="partnerCode" />
+    <result column="iot_protocol_version" jdbcType="INTEGER" property="iotProtocolVersion" />
+    <result column="iot_dev_imsi" jdbcType="VARCHAR" property="iotDevImsi" />
+    <result column="iot_dev_imei" jdbcType="VARCHAR" property="iotDevImei" />
+    <result column="iot_dev_cert" jdbcType="VARCHAR" property="iotDevCert" />
+    <result column="iot_dev_regcode" jdbcType="INTEGER" property="iotDevRegcode" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="state" jdbcType="TINYINT" property="state" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, iot_dev_id, nb_dev_id, partner_code, iot_protocol_version, iot_dev_imsi, iot_dev_imei, 
+    iot_dev_cert, iot_dev_regcode, create_date, update_date, version, state
+  </sql>
+  <select id="selectByExample" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from iot_device_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from iot_device_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from iot_device_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfoExample">
+    delete from iot_device_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into iot_device_info (iot_dev_id, nb_dev_id, partner_code, 
+      iot_protocol_version, iot_dev_imsi, iot_dev_imei, 
+      iot_dev_cert, iot_dev_regcode, create_date, 
+      update_date, version, state
+      )
+    values (#{iotDevId,jdbcType=VARCHAR}, #{nbDevId,jdbcType=VARCHAR}, #{partnerCode,jdbcType=BIGINT}, 
+      #{iotProtocolVersion,jdbcType=INTEGER}, #{iotDevImsi,jdbcType=VARCHAR}, #{iotDevImei,jdbcType=VARCHAR}, 
+      #{iotDevCert,jdbcType=VARCHAR}, #{iotDevRegcode,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{version,jdbcType=INTEGER}, #{state,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into iot_device_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="iotDevId != null">
+        iot_dev_id,
+      </if>
+      <if test="nbDevId != null">
+        nb_dev_id,
+      </if>
+      <if test="partnerCode != null">
+        partner_code,
+      </if>
+      <if test="iotProtocolVersion != null">
+        iot_protocol_version,
+      </if>
+      <if test="iotDevImsi != null">
+        iot_dev_imsi,
+      </if>
+      <if test="iotDevImei != null">
+        iot_dev_imei,
+      </if>
+      <if test="iotDevCert != null">
+        iot_dev_cert,
+      </if>
+      <if test="iotDevRegcode != null">
+        iot_dev_regcode,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="iotDevId != null">
+        #{iotDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="nbDevId != null">
+        #{nbDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerCode != null">
+        #{partnerCode,jdbcType=BIGINT},
+      </if>
+      <if test="iotProtocolVersion != null">
+        #{iotProtocolVersion,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevImsi != null">
+        #{iotDevImsi,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevImei != null">
+        #{iotDevImei,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevCert != null">
+        #{iotDevCert,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevRegcode != null">
+        #{iotDevRegcode,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfoExample" resultType="java.lang.Long">
+    select count(*) from iot_device_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update iot_device_info
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.iotDevId != null">
+        iot_dev_id = #{record.iotDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nbDevId != null">
+        nb_dev_id = #{record.nbDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.partnerCode != null">
+        partner_code = #{record.partnerCode,jdbcType=BIGINT},
+      </if>
+      <if test="record.iotProtocolVersion != null">
+        iot_protocol_version = #{record.iotProtocolVersion,jdbcType=INTEGER},
+      </if>
+      <if test="record.iotDevImsi != null">
+        iot_dev_imsi = #{record.iotDevImsi,jdbcType=VARCHAR},
+      </if>
+      <if test="record.iotDevImei != null">
+        iot_dev_imei = #{record.iotDevImei,jdbcType=VARCHAR},
+      </if>
+      <if test="record.iotDevCert != null">
+        iot_dev_cert = #{record.iotDevCert,jdbcType=VARCHAR},
+      </if>
+      <if test="record.iotDevRegcode != null">
+        iot_dev_regcode = #{record.iotDevRegcode,jdbcType=INTEGER},
+      </if>
+      <if test="record.createDate != null">
+        create_date = #{record.createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateDate != null">
+        update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.version != null">
+        version = #{record.version,jdbcType=INTEGER},
+      </if>
+      <if test="record.state != null">
+        state = #{record.state,jdbcType=TINYINT},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update iot_device_info
+    set id = #{record.id,jdbcType=BIGINT},
+      iot_dev_id = #{record.iotDevId,jdbcType=VARCHAR},
+      nb_dev_id = #{record.nbDevId,jdbcType=VARCHAR},
+      partner_code = #{record.partnerCode,jdbcType=BIGINT},
+      iot_protocol_version = #{record.iotProtocolVersion,jdbcType=INTEGER},
+      iot_dev_imsi = #{record.iotDevImsi,jdbcType=VARCHAR},
+      iot_dev_imei = #{record.iotDevImei,jdbcType=VARCHAR},
+      iot_dev_cert = #{record.iotDevCert,jdbcType=VARCHAR},
+      iot_dev_regcode = #{record.iotDevRegcode,jdbcType=INTEGER},
+      create_date = #{record.createDate,jdbcType=TIMESTAMP},
+      update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+      version = #{record.version,jdbcType=INTEGER},
+      state = #{record.state,jdbcType=TINYINT}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfo">
+    update iot_device_info
+    <set>
+      <if test="iotDevId != null">
+        iot_dev_id = #{iotDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="nbDevId != null">
+        nb_dev_id = #{nbDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerCode != null">
+        partner_code = #{partnerCode,jdbcType=BIGINT},
+      </if>
+      <if test="iotProtocolVersion != null">
+        iot_protocol_version = #{iotProtocolVersion,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevImsi != null">
+        iot_dev_imsi = #{iotDevImsi,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevImei != null">
+        iot_dev_imei = #{iotDevImei,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevCert != null">
+        iot_dev_cert = #{iotDevCert,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevRegcode != null">
+        iot_dev_regcode = #{iotDevRegcode,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceInfo">
+    update iot_device_info
+    set iot_dev_id = #{iotDevId,jdbcType=VARCHAR},
+      nb_dev_id = #{nbDevId,jdbcType=VARCHAR},
+      partner_code = #{partnerCode,jdbcType=BIGINT},
+      iot_protocol_version = #{iotProtocolVersion,jdbcType=INTEGER},
+      iot_dev_imsi = #{iotDevImsi,jdbcType=VARCHAR},
+      iot_dev_imei = #{iotDevImei,jdbcType=VARCHAR},
+      iot_dev_cert = #{iotDevCert,jdbcType=VARCHAR},
+      iot_dev_regcode = #{iotDevRegcode,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      version = #{version,jdbcType=INTEGER},
+      state = #{state,jdbcType=TINYINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

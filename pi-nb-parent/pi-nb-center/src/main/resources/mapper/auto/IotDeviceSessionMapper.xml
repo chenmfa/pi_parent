@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pi.nbcenter.device.mapper.auto.IotDeviceSessionMapper">
+  <resultMap id="BaseResultMap" type="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="iot_dev_id" jdbcType="VARCHAR" property="iotDevId" />
+    <result column="iot_dev_ip" jdbcType="VARCHAR" property="iotDevIp" />
+    <result column="iot_dev_port" jdbcType="INTEGER" property="iotDevPort" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="latest_active_time" jdbcType="TIMESTAMP" property="latestActiveTime" />
+    <result column="iot_dev_state" jdbcType="INTEGER" property="iotDevState" />
+    <result column="iot_dev_battery" jdbcType="INTEGER" property="iotDevBattery" />
+    <result column="iot_dev_battery_percent" jdbcType="INTEGER" property="iotDevBatteryPercent" />
+    <result column="iot_dev_rssi" jdbcType="INTEGER" property="iotDevRssi" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    <result column="iot_dev_seckey" jdbcType="VARBINARY" property="iotDevSeckey" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, iot_dev_id, iot_dev_ip, iot_dev_port, create_date, update_date, latest_active_time, 
+    iot_dev_state, iot_dev_battery, iot_dev_battery_percent, iot_dev_rssi
+  </sql>
+  <sql id="Blob_Column_List">
+    iot_dev_seckey
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSessionExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from iot_device_session
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSessionExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from iot_device_session
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from iot_device_session
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from iot_device_session
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSessionExample">
+    delete from iot_device_session
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into iot_device_session (iot_dev_id, iot_dev_ip, iot_dev_port, 
+      create_date, update_date, latest_active_time, 
+      iot_dev_state, iot_dev_battery, iot_dev_battery_percent, 
+      iot_dev_rssi, iot_dev_seckey)
+    values (#{iotDevId,jdbcType=VARCHAR}, #{iotDevIp,jdbcType=VARCHAR}, #{iotDevPort,jdbcType=INTEGER}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{latestActiveTime,jdbcType=TIMESTAMP}, 
+      #{iotDevState,jdbcType=INTEGER}, #{iotDevBattery,jdbcType=INTEGER}, #{iotDevBatteryPercent,jdbcType=INTEGER}, 
+      #{iotDevRssi,jdbcType=INTEGER}, #{iotDevSeckey,jdbcType=VARBINARY})
+  </insert>
+  <insert id="insertSelective" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into iot_device_session
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="iotDevId != null">
+        iot_dev_id,
+      </if>
+      <if test="iotDevIp != null">
+        iot_dev_ip,
+      </if>
+      <if test="iotDevPort != null">
+        iot_dev_port,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="latestActiveTime != null">
+        latest_active_time,
+      </if>
+      <if test="iotDevState != null">
+        iot_dev_state,
+      </if>
+      <if test="iotDevBattery != null">
+        iot_dev_battery,
+      </if>
+      <if test="iotDevBatteryPercent != null">
+        iot_dev_battery_percent,
+      </if>
+      <if test="iotDevRssi != null">
+        iot_dev_rssi,
+      </if>
+      <if test="iotDevSeckey != null">
+        iot_dev_seckey,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="iotDevId != null">
+        #{iotDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevIp != null">
+        #{iotDevIp,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevPort != null">
+        #{iotDevPort,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="latestActiveTime != null">
+        #{latestActiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="iotDevState != null">
+        #{iotDevState,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevBattery != null">
+        #{iotDevBattery,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevBatteryPercent != null">
+        #{iotDevBatteryPercent,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevRssi != null">
+        #{iotDevRssi,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevSeckey != null">
+        #{iotDevSeckey,jdbcType=VARBINARY},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSessionExample" resultType="java.lang.Long">
+    select count(*) from iot_device_session
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update iot_device_session
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.iotDevId != null">
+        iot_dev_id = #{record.iotDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.iotDevIp != null">
+        iot_dev_ip = #{record.iotDevIp,jdbcType=VARCHAR},
+      </if>
+      <if test="record.iotDevPort != null">
+        iot_dev_port = #{record.iotDevPort,jdbcType=INTEGER},
+      </if>
+      <if test="record.createDate != null">
+        create_date = #{record.createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateDate != null">
+        update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.latestActiveTime != null">
+        latest_active_time = #{record.latestActiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.iotDevState != null">
+        iot_dev_state = #{record.iotDevState,jdbcType=INTEGER},
+      </if>
+      <if test="record.iotDevBattery != null">
+        iot_dev_battery = #{record.iotDevBattery,jdbcType=INTEGER},
+      </if>
+      <if test="record.iotDevBatteryPercent != null">
+        iot_dev_battery_percent = #{record.iotDevBatteryPercent,jdbcType=INTEGER},
+      </if>
+      <if test="record.iotDevRssi != null">
+        iot_dev_rssi = #{record.iotDevRssi,jdbcType=INTEGER},
+      </if>
+      <if test="record.iotDevSeckey != null">
+        iot_dev_seckey = #{record.iotDevSeckey,jdbcType=VARBINARY},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update iot_device_session
+    set id = #{record.id,jdbcType=BIGINT},
+      iot_dev_id = #{record.iotDevId,jdbcType=VARCHAR},
+      iot_dev_ip = #{record.iotDevIp,jdbcType=VARCHAR},
+      iot_dev_port = #{record.iotDevPort,jdbcType=INTEGER},
+      create_date = #{record.createDate,jdbcType=TIMESTAMP},
+      update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+      latest_active_time = #{record.latestActiveTime,jdbcType=TIMESTAMP},
+      iot_dev_state = #{record.iotDevState,jdbcType=INTEGER},
+      iot_dev_battery = #{record.iotDevBattery,jdbcType=INTEGER},
+      iot_dev_battery_percent = #{record.iotDevBatteryPercent,jdbcType=INTEGER},
+      iot_dev_rssi = #{record.iotDevRssi,jdbcType=INTEGER},
+      iot_dev_seckey = #{record.iotDevSeckey,jdbcType=VARBINARY}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update iot_device_session
+    set id = #{record.id,jdbcType=BIGINT},
+      iot_dev_id = #{record.iotDevId,jdbcType=VARCHAR},
+      iot_dev_ip = #{record.iotDevIp,jdbcType=VARCHAR},
+      iot_dev_port = #{record.iotDevPort,jdbcType=INTEGER},
+      create_date = #{record.createDate,jdbcType=TIMESTAMP},
+      update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+      latest_active_time = #{record.latestActiveTime,jdbcType=TIMESTAMP},
+      iot_dev_state = #{record.iotDevState,jdbcType=INTEGER},
+      iot_dev_battery = #{record.iotDevBattery,jdbcType=INTEGER},
+      iot_dev_battery_percent = #{record.iotDevBatteryPercent,jdbcType=INTEGER},
+      iot_dev_rssi = #{record.iotDevRssi,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    update iot_device_session
+    <set>
+      <if test="iotDevId != null">
+        iot_dev_id = #{iotDevId,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevIp != null">
+        iot_dev_ip = #{iotDevIp,jdbcType=VARCHAR},
+      </if>
+      <if test="iotDevPort != null">
+        iot_dev_port = #{iotDevPort,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="latestActiveTime != null">
+        latest_active_time = #{latestActiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="iotDevState != null">
+        iot_dev_state = #{iotDevState,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevBattery != null">
+        iot_dev_battery = #{iotDevBattery,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevBatteryPercent != null">
+        iot_dev_battery_percent = #{iotDevBatteryPercent,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevRssi != null">
+        iot_dev_rssi = #{iotDevRssi,jdbcType=INTEGER},
+      </if>
+      <if test="iotDevSeckey != null">
+        iot_dev_seckey = #{iotDevSeckey,jdbcType=VARBINARY},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    update iot_device_session
+    set iot_dev_id = #{iotDevId,jdbcType=VARCHAR},
+      iot_dev_ip = #{iotDevIp,jdbcType=VARCHAR},
+      iot_dev_port = #{iotDevPort,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      latest_active_time = #{latestActiveTime,jdbcType=TIMESTAMP},
+      iot_dev_state = #{iotDevState,jdbcType=INTEGER},
+      iot_dev_battery = #{iotDevBattery,jdbcType=INTEGER},
+      iot_dev_battery_percent = #{iotDevBatteryPercent,jdbcType=INTEGER},
+      iot_dev_rssi = #{iotDevRssi,jdbcType=INTEGER},
+      iot_dev_seckey = #{iotDevSeckey,jdbcType=VARBINARY}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.pi.nbcenter.device.entity.auto.IotDeviceSession">
+    update iot_device_session
+    set iot_dev_id = #{iotDevId,jdbcType=VARCHAR},
+      iot_dev_ip = #{iotDevIp,jdbcType=VARCHAR},
+      iot_dev_port = #{iotDevPort,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      latest_active_time = #{latestActiveTime,jdbcType=TIMESTAMP},
+      iot_dev_state = #{iotDevState,jdbcType=INTEGER},
+      iot_dev_battery = #{iotDevBattery,jdbcType=INTEGER},
+      iot_dev_battery_percent = #{iotDevBatteryPercent,jdbcType=INTEGER},
+      iot_dev_rssi = #{iotDevRssi,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pi.nbcenter.device.mapper.auto.BasePartnerConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.pi.nbcenter.device.entity.auto.BasePartnerConfig" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="partner_code" property="partnerCode" jdbcType="BIGINT" />
+    <result column="partner_config" property="partnerConfig" jdbcType="VARCHAR" />
+    <result column="partner_config_value" property="partnerConfigValue" jdbcType="VARCHAR" />
+    <result column="config_state" property="configState" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, partner_code, partner_config, partner_config_value, config_state
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfigExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from base_partner_config
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from base_partner_config
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from base_partner_config
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfigExample" >
+    delete from base_partner_config
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfig" >
+    insert into base_partner_config (id, partner_code, partner_config, 
+      partner_config_value, config_state)
+    values (#{id,jdbcType=INTEGER}, #{partnerCode,jdbcType=BIGINT}, #{partnerConfig,jdbcType=VARCHAR}, 
+      #{partnerConfigValue,jdbcType=VARCHAR}, #{configState,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfig" >
+    insert into base_partner_config
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="partnerCode != null" >
+        partner_code,
+      </if>
+      <if test="partnerConfig != null" >
+        partner_config,
+      </if>
+      <if test="partnerConfigValue != null" >
+        partner_config_value,
+      </if>
+      <if test="configState != null" >
+        config_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="partnerCode != null" >
+        #{partnerCode,jdbcType=BIGINT},
+      </if>
+      <if test="partnerConfig != null" >
+        #{partnerConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerConfigValue != null" >
+        #{partnerConfigValue,jdbcType=VARCHAR},
+      </if>
+      <if test="configState != null" >
+        #{configState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+
+
+  <select id="countByExample" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfigExample" resultType="java.lang.Integer" >
+    select count(*) from base_partner_config
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update base_partner_config
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.partnerCode != null" >
+        partner_code = #{record.partnerCode,jdbcType=BIGINT},
+      </if>
+      <if test="record.partnerConfig != null" >
+        partner_config = #{record.partnerConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="record.partnerConfigValue != null" >
+        partner_config_value = #{record.partnerConfigValue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.configState != null" >
+        config_state = #{record.configState,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update base_partner_config
+    set id = #{record.id,jdbcType=INTEGER},
+      partner_code = #{record.partnerCode,jdbcType=BIGINT},
+      partner_config = #{record.partnerConfig,jdbcType=VARCHAR},
+      partner_config_value = #{record.partnerConfigValue,jdbcType=VARCHAR},
+      config_state = #{record.configState,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfig" >
+    update base_partner_config
+    <set >
+      <if test="partnerCode != null" >
+        partner_code = #{partnerCode,jdbcType=BIGINT},
+      </if>
+      <if test="partnerConfig != null" >
+        partner_config = #{partnerConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerConfigValue != null" >
+        partner_config_value = #{partnerConfigValue,jdbcType=VARCHAR},
+      </if>
+      <if test="configState != null" >
+        config_state = #{configState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.pi.nbcenter.device.entity.auto.BasePartnerConfig" >
+    update base_partner_config
+    set partner_code = #{partnerCode,jdbcType=BIGINT},
+      partner_config = #{partnerConfig,jdbcType=VARCHAR},
+      partner_config_value = #{partnerConfigValue,jdbcType=VARCHAR},
+      config_state = #{configState,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
