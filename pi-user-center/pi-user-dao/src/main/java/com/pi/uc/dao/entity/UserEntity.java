@@ -1,11 +1,11 @@
-package com.pi.usercenter.dao.entity;
+package com.pi.uc.dao.entity;
 
 import com.pi.comm.entity.BaseEntity;
 
 /**
  * @description 表user的实体类
  * @author chenmfa
- * @date 2018-09-05 02:39:40
+ * @date 2018-09-05 17:29:19
  */
 public class UserEntity extends BaseEntity{
 	private static final long serialVersionUID = -4972683369271453960L;

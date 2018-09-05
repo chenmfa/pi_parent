@@ -1,9 +1,9 @@
 package com.pi.nbcenter.base.errorcode.base;
 
 public enum ErrorPartner {
-  PARTNER_IS_EMPTY(1, 100201, "PARTNER_INFO.PARTNER_IS_EMPTY", "合作商编号为空"),
-  PARTNER_INFO_NOT_FOUND(1, 100202, "PARTNER_INFO.PARTNER_INFO_NOT_FOUND", "合作商信息不存在"),
-  NO_PARTNER_SERVICE_PROVIDED(1, 100203, "PARTNER_INFO.NO_PARTNER_SERVICE_PROVIDED", "该合作商不存在此功能")
+  PARTNER_IS_EMPTY(1, 1100201, "PARTNER_INFO.PARTNER_IS_EMPTY", "合作商编号为空"),
+  PARTNER_INFO_NOT_FOUND(1, 1100202, "PARTNER_INFO.PARTNER_INFO_NOT_FOUND", "合作商信息不存在"),
+  NO_PARTNER_SERVICE_PROVIDED(1, 1100203, "PARTNER_INFO.NO_PARTNER_SERVICE_PROVIDED", "该合作商不存在此功能")
   ;
   private int source;//错误码来源 1.系统内部 2.平台
   private int code;//错误码

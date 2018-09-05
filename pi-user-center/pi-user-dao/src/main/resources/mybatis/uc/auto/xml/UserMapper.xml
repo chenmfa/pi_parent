@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pi.uc.dao.mapper.UserMapper">
+	<resultMap id="UserEntityMap" type="com.pi.uc.dao.entity.UserEntity">
+		<result column="id" property="id" />
+		<result column="create_date" property="createDate" />
+		<result column="update_date" property="updateDate" />
+		<result column="version" property="version" />
+		<result column="mobile" property="mobile" />
+		<result column="password" property="password" />
+		<result column="nick_name" property="nickName" />
+		<result column="name" property="name" />
+		<result column="age" property="age" />
+		<result column="sex" property="sex" />
+		<result column="wx_openid" property="wxOpenid" />
+		<result column="wx_unionid" property="wxUnionid" />
+		<result column="source_id" property="sourceId" />
+		<result column="state" property="state" />
+
+	</resultMap>
+
+	<sql id="all_columns">
+		id,create_date,update_date,version,mobile,password,nick_name,name,age,sex,wx_openid,wx_unionid,source_id,state
+	</sql>
+	<sql id="updateSet">
+		<if test="mobile != null ">,mobile=#{mobile}</if>
+		<if test="password != null ">,password=#{password}</if>
+		<if test="nickName != null ">,nick_name=#{nickName}</if>
+		<if test="name != null ">,name=#{name}</if>
+		<if test="age != null ">,age=#{age}</if>
+		<if test="sex != null ">,sex=#{sex}</if>
+		<if test="wxOpenid != null ">,wx_openid=#{wxOpenid}</if>
+		<if test="wxUnionid != null ">,wx_unionid=#{wxUnionid}</if>
+		<if test="sourceId != null ">,source_id=#{sourceId}</if>
+		<if test="state != null ">,state=#{state}</if>
+
+	</sql>
+	<sql id="where">
+		<where>
+			<if test="id != null ">and id=#{id}</if>
+			<if test="createDate != null ">and create_date=#{createDate}</if>
+			<if test="updateDate != null ">and update_date=#{updateDate}</if>
+			<if test="version != null ">and version=#{version}</if>
+			<if test="mobile != null ">and mobile=#{mobile}</if>
+			<if test="password != null ">and password=#{password}</if>
+			<if test="nickName != null ">and nick_name=#{nickName}</if>
+			<if test="name != null ">and name=#{name}</if>
+			<if test="age != null ">and age=#{age}</if>
+			<if test="sex != null ">and sex=#{sex}</if>
+			<if test="wxOpenid != null ">and wx_openid=#{wxOpenid}</if>
+			<if test="wxUnionid != null ">and wx_unionid=#{wxUnionid}</if>
+			<if test="sourceId != null ">and source_id=#{sourceId}</if>
+			<if test="state != null ">and state=#{state}</if>
+			
+		</where>
+	</sql>
+	<sql id="table_name">
+		user
+	</sql>
+
+	<select id="findOne" resultMap="UserEntityMap">
+		select
+		<include refid="all_columns" />
+		from
+		<include refid="table_name" />
+		where id=#{id}
+	</select>
+  <select id="findAll" resultMap="UserEntityMap">
+    SELECT
+    <include refid="all_columns" />
+    <include refid="table_name" /> limit 1000
+  </select>
+  <select id="findList" resultMap="UserEntityMap">
+    select <include refid="all_columns" /> from <include refid="table_name" /> <include refid="where" />
+  </select>
+  
+    
+	<update id="updateById" parameterType="com.pi.uc.dao.entity.UserEntity">
+		update <include refid="table_name" />
+		set version=version+1, update_date=now()  <include refid="updateSet" />
+		where ID=#{id} AND VERSION=#{version}
+	</update>
+	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="com.pi.uc.dao.entity.UserEntity">
+		insert into <include refid="table_name" />
+		(<include refid="all_columns" />)
+		values( NULL, now(), now(), 200,#{mobile},#{password},#{nickName},#{name},#{age},#{sex},#{wxOpenid},#{wxUnionid},#{sourceId},#{state} )
+	</insert>
+
+  <select id="count" resultType="long">
+    SELECT count(1) FROM <include refid="table_name" />
+  </select>
+  <select id="countList" resultType="long">
+    SELECT count(1) FROM <include refid="table_name" />
+    <include refid="where" />
+  </select>	
+  <select id="getByIds" parameterType="list" resultType="UserEntityMap">
+    SELECT
+    <include refid="all_columns" />
+    FROM <include refid="table_name" />
+    <where>
+      ID in
+      <foreach item="item" index="index" collection="list" open="("
+           separator="," close=")">
+        #{item}
+      </foreach>
+    </where>
+  </select>
+  
+	<delete id="delete" parameterType="long">
+	  DELETE FROM <include refid="table_name" />
+	  WHERE ID=#{id}
+	</delete>
+  <delete id="deleteByIds">
+    DELETE FROM <include refid="table_name" />
+    <where>
+      ID in
+      <foreach item="item" index="index" collection="list" open="("
+           separator="," close=")">
+        #{item}
+      </foreach>
+    </where>
+  </delete>
+</mapper>

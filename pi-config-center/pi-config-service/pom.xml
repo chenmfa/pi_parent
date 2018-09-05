@@ -3,14 +3,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.pi</groupId>
-    <artifactId>pi-comm</artifactId>
+    <artifactId>pi-config-center</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>pi-comm-entity</artifactId>
+  <artifactId>pi-config-service</artifactId>
   <dependencies>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>com.pi</groupId>
+      <artifactId>pi-config-dao</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>com.pi</groupId>
+      <artifactId>pi-util</artifactId>
+    </dependency>    
   </dependencies>
 </project>
