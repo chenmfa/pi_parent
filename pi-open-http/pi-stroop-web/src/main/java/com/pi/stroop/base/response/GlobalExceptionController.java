@@ -1,4 +1,4 @@
-package com.pi.nbcenter.base.response;
+package com.pi.stroop.base.response;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

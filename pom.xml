@@ -164,5 +164,7 @@
 		<module>pi-web</module>
 		<module>pi-open-http</module>
 		<module>pi-automatic-tool</module>
+		<module>pi-stroop</module>
+		<module>pi-config-center</module>
 	</modules>
 </project>
