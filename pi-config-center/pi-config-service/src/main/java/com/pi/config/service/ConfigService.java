@@ -1,18 +1,18 @@
 package com.pi.config.service;
 
-import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.pi.base.enumerate.record.RecordState;
+import com.pi.base.enumerate.redis.RedisCacheEnum;
 import com.pi.base.util.cache.RedisUtil;
-import com.pi.config.constant.ConfigConstant;
 import com.pi.config.dao.entity.BasePartnerConfigEntity;
 import com.pi.config.dao.mapper.BasePartnerConfigMapper;
 import com.pi.config.dao.param.BasePartnerConfigParam;
@@ -29,8 +29,13 @@ public class ConfigService {
       @NotNull(message="CONFIG_PARTNER.SOURCE_ID_EMPTY") Long sourceId, 
       @NotNull(message="CONFIG_PARTNER.CONFIG_NAME_EMPTY") PartnerConfig config) 
           throws Exception{
-    RedisUtil.get(sourceId + config.getConfigName());
-    return null;
+    String configVal = RedisUtil.get(
+        MessageFormat.format(
+            RedisCacheEnum.SIMPLE_PARTNER_CONFIG.getKey(), sourceId, config.getConfigName()));
+    if(StringUtils.isBlank(configVal)){
+      return queryPartnerConfigFromDb(sourceId, config);
+    }
+    return configVal;
   }
   
   public String queryPartnerConfigFromDb(
@@ -45,20 +50,9 @@ public class ConfigService {
       return null;
     }
     RedisUtil.directset(
-        sourceId + config.getConfigName(), 
+        MessageFormat.format(RedisCacheEnum.SIMPLE_PARTNER_CONFIG.getKey(), sourceId, config.getConfigName()), 
         configList.get(0).getPartnerConfigValue(), 
-        ConfigConstant.DEFAULT_CONFIG_EXPIRE);
+        RedisCacheEnum.SIMPLE_PARTNER_CONFIG.getExpired());
     return configList.get(0).getPartnerConfigValue();
-  }
-  
-  @PostConstruct
-  private void init(){
-    List<BasePartnerConfigEntity> configList = queryPartnerConfigFromDb();
-    if(null == configList || configList.isEmpty()){
-      return;
-    }
-    for(BasePartnerConfigEntity entity: configList){
-      RedisUtil.directset(entity.getPartnerConfig(), value, expried)
-    }
   }
 }
