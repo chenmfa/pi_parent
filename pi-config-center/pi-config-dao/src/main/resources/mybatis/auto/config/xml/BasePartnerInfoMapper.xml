@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.pi.stroop.dao.mapper.StroopInvitationMapper">
-	<resultMap id="StroopInvitationEntityMap" type="com.pi.stroop.dao.entity.StroopInvitationEntity">
-		<result column="id" property="id" />
-		<result column="create_date" property="createDate" />
-		<result column="update_date" property="updateDate" />
-		<result column="version" property="version" />
-		<result column="user_id" property="userId" />
-		<result column="inviter_id" property="inviterId" />
-		<result column="user_pv" property="userPv" />
-
-	</resultMap>
-
+<mapper namespace="com.pi.config.dao.mapper.BasePartnerInfoMapper">
 	<sql id="all_columns">
-		id,create_date,update_date,version,user_id,inviter_id,user_pv
+		id,create_date,update_date,version,partner_name,partner_alias
 	</sql>
 	<sql id="updateSet">
-		<if test="userId != null ">,user_id=#{userId}</if>
-		<if test="inviterId != null ">,inviter_id=#{inviterId}</if>
-		<if test="userPv != null ">,user_pv=#{userPv}</if>
+		<if test="partnerName != null ">,partner_name=#{partnerName}</if>
+		<if test="partnerAlias != null ">,partner_alias=#{partnerAlias}</if>
 
 	</sql>
 	<sql id="where">
@@ -27,44 +15,43 @@
 			<if test="createDate != null ">and create_date=#{createDate}</if>
 			<if test="updateDate != null ">and update_date=#{updateDate}</if>
 			<if test="version != null ">and version=#{version}</if>
-			<if test="userId != null ">and user_id=#{userId}</if>
-			<if test="inviterId != null ">and inviter_id=#{inviterId}</if>
-			<if test="userPv != null ">and user_pv=#{userPv}</if>
+			<if test="partnerName != null ">and partner_name=#{partnerName}</if>
+			<if test="partnerAlias != null ">and partner_alias=#{partnerAlias}</if>
 			
 		</where>
 	</sql>
 	<sql id="table_name">
-		stroop_invitation
+		base_partner_info
 	</sql>
 
-	<select id="findOne" resultMap="StroopInvitationEntityMap">
+	<select id="findOne" resultType="BasePartnerInfoEntity">
 		select
 		<include refid="all_columns" />
 		from
 		<include refid="table_name" />
 		where id=#{id}
 	</select>
-  <select id="findAll" resultMap="StroopInvitationEntityMap">
+  <select id="findAll" resultType="BasePartnerInfoEntity">
     SELECT
     <include refid="all_columns" />
     <include refid="table_name" /> limit 1000
   </select>
-  <select id="findList" resultMap="StroopInvitationEntityMap">
+  <select id="findList" resultType="BasePartnerInfoEntity">
     select <include refid="all_columns" /> from <include refid="table_name" /> <include refid="where" />
   </select>
   
     
-	<update id="updateById" parameterType="com.pi.stroop.dao.entity.StroopInvitationEntity">
+	<update id="updateById" parameterType="com.pi.config.dao.entity.BasePartnerInfoEntity">
 		update <include refid="table_name" />
 		set version=version+1, update_date=now()  <include refid="updateSet" />
 		where ID=#{id} AND VERSION=#{version}
 	</update>
 	
 	
-	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="com.pi.stroop.dao.entity.StroopInvitationEntity">
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="com.pi.config.dao.entity.BasePartnerInfoEntity">
 		insert into <include refid="table_name" />
 		(<include refid="all_columns" />)
-		values( NULL, now(), now(), 200,#{userId},#{inviterId},#{userPv} )
+		values( NULL, now(), now(), 200,#{partnerName},#{partnerAlias} )
 	</insert>
 
   <select id="count" resultType="long">
@@ -74,7 +61,7 @@
     SELECT count(1) FROM <include refid="table_name" />
     <include refid="where" />
   </select>	
-  <select id="getByIds" parameterType="list" resultType="StroopInvitationEntityMap">
+  <select id="getByIds" parameterType="list" resultType="BasePartnerInfoEntity">
     SELECT
     <include refid="all_columns" />
     FROM <include refid="table_name" />

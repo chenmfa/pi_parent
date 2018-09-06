@@ -5,19 +5,20 @@ import com.pi.comm.entity.BaseEntity;
 /**
  * @description 表user的实体类
  * @author chenmfa
- * @date 2018-09-05 17:29:19
+ * @date 2018-09-06 19:33:12
  */
 public class UserEntity extends BaseEntity{
 	private static final long serialVersionUID = -4972683369271453960L;
 	private String            mobile;             // 手机号 
 	private String            password;           // 密码(默认为空--后期按照需求定) 
 	private String            nickName;           // 昵称 
+	private String            avatar;             // 头像 
 	private String            name;               // 姓名 
 	private Integer           age;                // 年龄 
 	private Integer           sex;                // 1.男 2. 女 
 	private String            wxOpenid;           // 微信openid 
 	private String            wxUnionid;          // 微信unionid 
-	private Integer           sourceId;           // 用户来源 
+	private Long              sourceId;           // 用户来源 
 	private Integer           state;              // 10 正常 20 删除/注销 
 
 	public String getMobile() {
@@ -42,6 +43,14 @@ public class UserEntity extends BaseEntity{
 
 	public void setNickName(String nickName) {
 		this.nickName=nickName;
+	}
+
+	public String getAvatar() {
+		return this.avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar=avatar;
 	}
 
 	public String getName() {
@@ -84,11 +93,11 @@ public class UserEntity extends BaseEntity{
 		this.wxUnionid=wxUnionid;
 	}
 
-	public Integer getSourceId() {
+	public Long getSourceId() {
 		return this.sourceId;
 	}
 
-	public void setSourceId(Integer sourceId) {
+	public void setSourceId(Long sourceId) {
 		this.sourceId=sourceId;
 	}
 

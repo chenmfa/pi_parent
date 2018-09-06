@@ -46,7 +46,7 @@ public class BasedMapperGenerator {
 		}
 		String mapperTemplate = "";
 		try (InputStream is = BasedMapperGenerator.class
-				.getResourceAsStream("/template.xml");
+				.getResourceAsStream("/BasedTemplate.xml");
 				Scanner scanner = new Scanner(is, "UTF-8");) {
 			mapperTemplate = scanner.useDelimiter("\\A").next();
 		}
@@ -156,11 +156,9 @@ public class BasedMapperGenerator {
 			insertContent.append(",#{"+name+"}");
 		}
 		
-		String mapName = entityClass.getClassName() + "Map";
-		
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("namespace", mapperClassFullName);
-		map.put("resultMapId", mapName);
+		map.put("resultTypeId", entityClass.getClassName());
 		map.put("resultMapContent", resultMap.toString());
 		map.put("all_columns", allColumns.substring(1));
 		map.put("table_name", tableName);

@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.pi.stroop.dao.mapper.StroopDiagnosisHistoryMapper">
-	<resultMap id="StroopDiagnosisHistoryEntityMap" type="com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity">
-		<result column="id" property="id" />
-		<result column="create_date" property="createDate" />
-		<result column="update_date" property="updateDate" />
-		<result column="version" property="version" />
-		<result column="user_id" property="userId" />
-		<result column="invite_id" property="inviteId" />
-		<result column="invite_user_id" property="inviteUserId" />
-		<result column="diagnosis_info" property="diagnosisInfo" />
-		<result column="diagnosis_result" property="diagnosisResult" />
-		<result column="diagnosis_score" property="diagnosisScore" />
-		<result column="diagnosis_level" property="diagnosisLevel" />
-
-	</resultMap>
-
 	<sql id="all_columns">
 		id,create_date,update_date,version,user_id,invite_id,invite_user_id,diagnosis_info,diagnosis_result,diagnosis_score,diagnosis_level
 	</sql>
@@ -49,19 +34,19 @@
 		stroop_diagnosis_history
 	</sql>
 
-	<select id="findOne" resultMap="StroopDiagnosisHistoryEntityMap">
+	<select id="findOne" resultType="StroopDiagnosisHistoryEntity">
 		select
 		<include refid="all_columns" />
 		from
 		<include refid="table_name" />
 		where id=#{id}
 	</select>
-  <select id="findAll" resultMap="StroopDiagnosisHistoryEntityMap">
+  <select id="findAll" resultType="StroopDiagnosisHistoryEntity">
     SELECT
     <include refid="all_columns" />
     <include refid="table_name" /> limit 1000
   </select>
-  <select id="findList" resultMap="StroopDiagnosisHistoryEntityMap">
+  <select id="findList" resultType="StroopDiagnosisHistoryEntity">
     select <include refid="all_columns" /> from <include refid="table_name" /> <include refid="where" />
   </select>
   
@@ -86,7 +71,7 @@
     SELECT count(1) FROM <include refid="table_name" />
     <include refid="where" />
   </select>	
-  <select id="getByIds" parameterType="list" resultType="StroopDiagnosisHistoryEntityMap">
+  <select id="getByIds" parameterType="list" resultType="StroopDiagnosisHistoryEntity">
     SELECT
     <include refid="all_columns" />
     FROM <include refid="table_name" />

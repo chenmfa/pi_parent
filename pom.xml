@@ -148,8 +148,24 @@
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<configuration>
+				  <nonFilteredFileExtensions>
+				    <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+				  </nonFilteredFileExtensions>
 					<encoding>UTF-8</encoding>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-source-plugin</artifactId>
+			  <executions>
+			   <execution>
+					  <id>attach-sources</id>
+					  <phase>verify</phase>
+					  <goals>
+					    <goal>jar-no-fork</goal>
+					  </goals>
+				  </execution>
+			  </executions>
 			</plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -161,7 +177,6 @@
 		<module>pi-nb-parent</module>
 		<module>pi-comm</module>
 		<module>pi-user-center</module>
-		<module>pi-web</module>
 		<module>pi-open-http</module>
 		<module>pi-automatic-tool</module>
 		<module>pi-stroop</module>

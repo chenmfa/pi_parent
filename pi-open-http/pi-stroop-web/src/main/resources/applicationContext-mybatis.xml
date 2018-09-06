@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+	   <!-- 其实这个可以配置在spring里面使用
+	     1. mybatis.configuration.mapUnderscoreToCamelCase=true
+       2. mybatis.configuration.map-underscore-to-camel-case=true 
+       @See org.apache.ibatis.reflection.MetaClass#findProperty
+     -->
+	    <setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings>
+<!--   <plugins>
+	 	<plugin interceptor="com.dsm.mybatis.page.interceptor.PageInterceptor" />
+	 	<plugin interceptor="com.dsm.apm.monitor.sql.MybatisSQLExecuteMonitor" />
+	</plugins> --> 
+</configuration>

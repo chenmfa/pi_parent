@@ -5,7 +5,7 @@ import com.pi.comm.entity.BaseEntity;
 /**
  * @description 表stroop_invitation的实体类
  * @author chenmfa
- * @date 2018-09-05 11:04:59
+ * @date 2018-09-06 14:27:41
  */
 public class StroopInvitationEntity extends BaseEntity{
 	private static final long serialVersionUID = -4972683369271453960L;

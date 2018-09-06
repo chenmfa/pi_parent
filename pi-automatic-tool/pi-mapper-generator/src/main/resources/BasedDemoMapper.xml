@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shangxin.sundries.dal.mapper.TUserMapper">
+	<sql id="all_columns">
+		user_id,phone,real_name,user_name,user_password,remark,inviter_id,add_time,vip_level,source,flag,user_avatar,user_sex,
+		birthday,user_paypwd,user_email,user_qq,user_ww,user_login_num,user_points,last_login_time,shopping_state,openid,user_wx,channel,registration_id
+	</sql>
+	<sql id="table_name">
+		t_user
+	</sql>
+
+	<select id="findByUserId" resultType="TUserEntityMap">
+		select
+		<include refid="all_columns" />
+		from
+		<include refid="table_name" />
+		where user_id=#{userId}
+	</select>
+
+	<select id="findByUserName" resultType="TUserEntityMap">
+		select
+		<include refid="all_columns" />
+		from
+		<include refid="table_name" />
+		where phone=#{userName}
+	</select>
+
+	<update id="updateUserPassword" >
+		update
+		<include refid="table_name" />
+		set user_password=#{newPassword} where user_id=#{userId}
+	</update>
+
+	<insert id="insert" parameterMap="">
+		insert into <include refid="table_name" />
+		( <include refid="all_columns" /> )
+		values( #{userId}, #{userName}, #{realName}, #{nickName},#{userPassword},${remark}, #{inviterId}, now(),  #{vipLevel}, #{source}, 1, #{userAvatar}, #{userSex}, #{birthday},
+				#{userPaypwd}, #{userEmail}, #{userQq}, #{userWw}, 0, #{userPoints}, #{lastLoginTime}, 0, #{openid}, #{userWx}, #{channel}, #{registrationId}  
+			)
+		
+	</insert>
+
+	<update id="updateUserLoginInfo">
+		update <include refid="table_name" /> set user_login_num=user_login_num+1, last_login_time=now() where user_id=#{userId}
+	</update>
+
+</mapper>

@@ -3,6 +3,7 @@ package com.pi.base.util.cache;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.pi.base.enumerate.charset.CommCharset;
+import com.pi.base.enumerate.redis.RedisCacheEnum;
 import com.pi.base.util.config.ConfigUtil;
 import com.pi.base.util.serialize.SerializationUtil;
 
@@ -598,6 +600,32 @@ public class RedisUtil {
       }
     }
   }
+  
+  /**
+   * @description 获取已缓存的内容
+   * @param key
+   * @return
+   * @throws UnsupportedEncodingException 
+   */
+  public static String get(RedisCacheEnum cacheKey, Object... args) throws UnsupportedEncodingException{
+    Jedis jedisBorrow = null;
+    try{
+      jedisBorrow = getInstance();
+      String key = getKeyByEnum(cacheKey, args);
+      if(!jedisBorrow.exists(key.getBytes(CHAR_SET))){
+        return null;
+      }
+      String value = jedisBorrow.get(key);
+      return value;
+    }catch(Exception e){
+      logger.error("获取的数据无法转换成目标类型",e);
+      return null;
+    }finally{
+      if(null != jedisBorrow){        
+        jedisBorrow.close();
+      }
+    }
+  }
 	
 	/**
 	 * @description 保存字符串内容到某个键下(并设置过期时间)
@@ -630,12 +658,21 @@ public class RedisUtil {
    * @return
    */
   public static boolean directset(String key, String value, int... expried){
+    return directset(key, value, -1, new Object[]{});
+  }
+  /**
+   * @description 覆盖字符串内容到某个键下(并设置过期时间)
+   * @param key
+   * @param value 
+   * @return
+   */
+  public static boolean directset(String key, String value, int expired, Object... args){
     Jedis jedisBorrow = null;
     try{
       jedisBorrow = getInstance();
       jedisBorrow.set(key, value);
-      if(null != expried && expried.length >0){
-        jedisBorrow.expire(key, expried[0]>0?expried[0]:1800);
+      if(expired > 0){
+        jedisBorrow.expire(key, expired);
       }
       return true;
     } finally{
@@ -643,6 +680,39 @@ public class RedisUtil {
         jedisBorrow.close();
       }
     }
+  }
+  /**
+   * @description 覆盖字符串内容到某个键下(并设置过期时间)
+   * @param key
+   * @param value 
+   * @return
+   */
+  public static boolean directset(RedisCacheEnum cacheKey, String value, Object...args){
+      String key = getKeyByEnum(cacheKey, args);
+      return directset(key, value, -1, args);  
+  }
+  /**
+   * @description 覆盖字符串内容到某个键下(并设置过期时间)
+   * @param cacheKey
+   * @param value 
+   * @param args
+   * @return
+   */
+  public static boolean directset(RedisCacheEnum cacheKey, String value, int expired){
+      return directset(cacheKey.getKey(), value, expired, new Object[]{});  
+  }
+  /**
+   * @description 覆盖字符串内容到某个键下(并设置过期时间)
+   * @param key
+   * @param value 
+   * @return
+   */
+  public static boolean directset(RedisCacheEnum cacheKey, String value, int expired, Object...args){
+      String key = getKeyByEnum(cacheKey, args);
+      if(expired <= 0 && cacheKey.getExpired() > 0 ){
+        expired = cacheKey.getExpired();
+      }
+      return directset(key, value, expired, args);  
   }
   /**
   * @description 覆盖字符串内容到某个键下(并设置过期时间)
@@ -708,6 +778,12 @@ public class RedisUtil {
       jedisBorrow.close();
     }
   }
+ }
+ 
+ private static String getKeyByEnum(RedisCacheEnum cacheKey, Object... args){
+   if(null == args || args.length == 0)
+     return cacheKey.getKey();
+   return MessageFormat.format(cacheKey.getKey(), args);
  }
   
   private static class JedisPoolHolder{

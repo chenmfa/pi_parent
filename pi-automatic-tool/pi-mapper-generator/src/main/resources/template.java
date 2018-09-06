@@ -3,7 +3,6 @@ package ${mapperPackage};
 import java.util.List;
 
 import ${fullEntityClassName};
-import ${fullParamClassName};
 
 /**
  * 表${tableName}的mapper类

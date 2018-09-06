@@ -5,7 +5,7 @@ import com.pi.comm.query.MapperQuery;
 /**
  * @description 表base_partner_config的实体类
  * @author chenmfa
- * @date 2018-09-05 19:45:55
+ * @date 2018-09-06 14:24:46
  */
 public class BasePartnerConfigParam extends MapperQuery{
 	private static final long serialVersionUID = -4972683369271453960L;
