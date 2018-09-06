@@ -118,6 +118,11 @@
 		    <artifactId>pi-util</artifactId>
 		    <version>${pi.util.version}</version>
 			</dependency>
+	    <dependency>
+	        <groupId>jcifs</groupId>
+	        <artifactId>jcifs</artifactId>
+	        <version>1.3.17</version>
+	    </dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>

@@ -1,5 +1,6 @@
 package com.pi.uc.service;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -11,25 +12,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
+import com.pi.base.contants.WxConstants;
+import com.pi.base.dto.result.respcode.error.ErrorServer;
+import com.pi.base.dto.result.respcode.user.UcResp;
+import com.pi.base.enumerate.file.FileSource;
 import com.pi.base.enumerate.record.RecordState;
 import com.pi.base.enumerate.redis.RedisCacheEnum;
 import com.pi.base.exception.ServiceException;
 import com.pi.base.util.cache.RedisUtil;
 import com.pi.base.util.http.v2.HttpPostUtil;
+import com.pi.base.util.transfer.windows.FileUtil;
 import com.pi.config.model.PartnerAppConfig;
 import com.pi.config.service.ConfigService;
-import com.pi.uc.constants.WxConstants;
 import com.pi.uc.dao.entity.UserEntity;
 import com.pi.uc.dao.mapper.UserMapper;
 import com.pi.uc.dao.param.UserParam;
-import com.pi.uc.model.user.bo.UserForm;
-import com.pi.uc.model.wx.WxAuthInfo;
+import com.pi.uc.model.user.UserPostForm;
 import com.pi.uc.model.wx.WxUserBaseInfo;
 import com.pi.uc.model.wx.WxUserInfo;
+import com.pi.uc.util.TokenUtil;
 
 @Validated
 @Service
@@ -39,6 +46,14 @@ public class UcUserService {
   private ConfigService configService;
   @Autowired
   private UserMapper userMapper;
+  @Value("${server.ftp.host}")
+  private String ftpHost;
+  @Value("${server.ftp.password}")
+  private String ftpPass;
+  @Value("${server.ftp.user}")
+  private String ftpUserName;
+  @Value("${server.ftp.parentFolder}")
+  private String ftpParentFolder;
   
   public String bindWeChat(
       @NotNull(message="UC_USER.SOURCE_ID_EMPTY") Long sourceId, 
@@ -51,8 +66,66 @@ public class UcUserService {
     //获取用户信息
     UserEntity entity = createIfNotExistUser(wxUserInfo, sourceId);
     //保存登录会话
-    
-    return null;
+    String token  = TokenUtil.getUserToken(entity);
+    return token;
+  }
+  
+  public String updateUserAvatar(MultipartFile file,
+      @NotNull(message="UC_USER.USER_ID_EMPTY") long userId) throws Exception{
+    validFileSource(file);
+    //查询用户信息
+    UserEntity entity = queryUserInfo(userId);
+    String url = transferAvatar(file);
+    //更新用户信息
+    entity.setAvatar(url);
+    userMapper.updateById(entity);
+    return url;
+  }
+  
+  public void updateUserInfo(UserPostForm form){
+    UserEntity entity = queryUserInfo(form.getLoginUserId());
+    entity.setAge(form.getAge());
+    entity.setMobile(form.getMobile());
+    entity.setName(form.getName());
+    entity.setSex(form.getSex());
+    entity.setEducation(form.getEducation());
+    int i = userMapper.updateById(entity);
+    if(i != 1){
+      throw new ServiceException(
+          ErrorServer.OPERATE_FAILED.getTag(),
+          ErrorServer.OPERATE_FAILED.getErrorCode());
+    }
+  }
+  
+  public UserEntity queryUserInfo(@NotNull(message="UC_USER.USER_ID_EMPTY") long userId){
+    UserEntity entity = userMapper.findOne(userId);
+    if(null == entity){
+      throw new ServiceException(
+          UcResp.RESP_USER_NOT_FOUND.getTag(),
+          UcResp.RESP_USER_NOT_FOUND.getErrorCode());
+    }
+    return entity;
+  }
+  
+  private void validFileSource(MultipartFile file){
+    if(file.isEmpty()){
+      throw new ServiceException("UC_USER.AVATAR_STREAM_IS_EMPTY");
+    }
+    int size = (int) file.getSize();
+    if(size > 2*1024*1024){
+      throw new ServiceException("UC_USER.AVATAR_OVER_MAX");
+    }
+  }
+  
+  private String transferAvatar(MultipartFile file) throws Exception{
+    File dest = new File("temp.png");
+    file.transferTo(dest);
+    String parentFplder = ftpParentFolder + "/" + FileSource.USER_PIC.name().toLowerCase();
+    String resultFile = FileUtil.transferToRemote(
+        ftpHost, ftpUserName, ftpPass, 
+        parentFplder, dest);
+    String url = ftpHost + parentFplder + "/" + resultFile;
+    return url;
   }
   
   private UserEntity createIfNotExistUser(WxUserInfo wxUserInfo, long sourceId) {

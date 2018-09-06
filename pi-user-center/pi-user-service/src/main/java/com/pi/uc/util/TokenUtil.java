@@ -1,10 +1,8 @@
 package com.pi.uc.util;
 
 import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +15,7 @@ import com.pi.base.util.cache.RedisUtil;
 import com.pi.base.util.lang.StringUtil;
 import com.pi.uc.dao.entity.UserEntity;
 
+//需要设置UserSession和自定义会话
 public class TokenUtil {
 	private static final Logger logger = LoggerFactory.getLogger(TokenUtil.class);
 	/**
@@ -36,14 +35,31 @@ public class TokenUtil {
         JSON.toJSONString(user), getTokenValidity(user.getSourceId()), new Object[]{user.getId()});
     return token;
   }
-  
-  public static UserEntity getUserSession(String account,String partnerCode){
+  /**
+   * @description 根据token获取登陆时的会话信息
+   * @param token
+   * @return 
+   */
+  public static UserEntity getUserSession(String token){
   	try {
-			return RedisUtil.get(RedisCacheEnum.USER_LOGIN_TOKEN, UserEntity.class);
+			return RedisUtil.get(RedisCacheEnum.USER_LOGIN_SESSION, UserEntity.class, new Object[]{token});
 		} catch (UnsupportedEncodingException e) {
 			throw new ServiceException(ErrorServer.REQUEST_UNAVAILABLE.getTag(),
 					ErrorServer.REQUEST_UNAVAILABLE.getErrorCode());
 		}
+  }
+  /**
+   * @description 根据用户id获取当前的登陆会话标志(这样可以限制做大登陆设备总数与挤账号)
+   * @param userId
+   * @return 
+   */
+  public static String getUserToken(long userId){
+    try {
+      return RedisUtil.get(RedisCacheEnum.USER_LOGIN_TOKEN, new Object[]{userId});
+    } catch (UnsupportedEncodingException e) {
+      throw new ServiceException(ErrorServer.REQUEST_UNAVAILABLE.getTag(),
+          ErrorServer.REQUEST_UNAVAILABLE.getErrorCode());
+    }
   }
   
   private static void validateUser(UserEntity user){
@@ -59,22 +75,6 @@ public class TokenUtil {
   	}
   }
   
-  private static String getSessionKey(String token){		
-		return MessageFormat.format(RedisCacheEnum.USER_LOGIN_TOKEN.getKey(), token);
-  }
-  private static String getTokenKey(String userId){    
-    return MessageFormat.format(RedisCacheEnum.USER_LOGIN_SESSION.getKey(), userId);
-  }
-  
-  /**
-   * @description token的额外校验(下个版本完善)
-   * @param token
-   * @return
-   */
-	public static boolean validate(String token) {
-		return true;
-	}
-	
   /**
    * @description 获取服务器的token时效
    * @param token
@@ -84,20 +84,26 @@ public class TokenUtil {
 		return -1;
 	}
 	
-	public static UserSession refreshUserSession(String account, Integer partnerCode){
-		if(null == account && null == partnerCode){
-			logger.error("操作账号或来源为空, 账号：{}， 来源：{}", account, partnerCode);
+	public static UserEntity refreshUserSession(Long userId, String token){
+		if(null == userId && null == token){
+			logger.error("操作账号或会话为空, 账号：{}， 来源：{}", userId, token);
 			return null;
 		}
-		UserSession session = getUserSession(account, String.valueOf(partnerCode));
+		UserEntity session = getUserSession(token);
 		if(null == session){
-			throw new ServiceException(ErrorUser.TOKEN_EXPIRED.getTag(),
-					ErrorUser.TOKEN_EXPIRED.getErrorCode());
+			throw new ServiceException(ErrorServer.REQUEST_HAS_EXPIRED.getTag(),
+			    ErrorServer.REQUEST_HAS_EXPIRED.getErrorCode());
 		}
-		session.setLastActive(System.currentTimeMillis()/1000);
-		RedisUtil.directset(
-				getSessionKey(String.valueOf(partnerCode), account), 
-				JSON.toJSONString(session), getTokenValidity(session.getPartnerCode()));
+		String userToken = getUserToken(userId);
+		if(StringUtils.isBlank(userToken) || userToken.indexOf(token) < 0){
+      throw new ServiceException(ErrorServer.REQUEST_HAS_EXPIRED.getTag(),
+          ErrorServer.REQUEST_HAS_EXPIRED.getErrorCode());
+		}
+
+    RedisUtil.directset(RedisCacheEnum.USER_LOGIN_SESSION,
+        JSON.toJSONString(session), getTokenValidity(session.getSourceId()), new Object[]{token});
+    RedisUtil.directset(RedisCacheEnum.USER_LOGIN_TOKEN,
+        userToken, getTokenValidity(session.getSourceId()), new Object[]{userId});   
 		return session;
 	}
 }

@@ -608,23 +608,18 @@ public class RedisUtil {
    * @throws UnsupportedEncodingException 
    */
   public static String get(RedisCacheEnum cacheKey, Object... args) throws UnsupportedEncodingException{
-    Jedis jedisBorrow = null;
-    try{
-      jedisBorrow = getInstance();
-      String key = getKeyByEnum(cacheKey, args);
-      if(!jedisBorrow.exists(key.getBytes(CHAR_SET))){
-        return null;
-      }
-      String value = jedisBorrow.get(key);
-      return value;
-    }catch(Exception e){
-      logger.error("获取的数据无法转换成目标类型",e);
-      return null;
-    }finally{
-      if(null != jedisBorrow){        
-        jedisBorrow.close();
-      }
-    }
+    String key = getKeyByEnum(cacheKey, args);
+    return get(key);
+  }
+  /**
+   * @description 获取已缓存的内容
+   * @param key
+   * @return
+   * @throws UnsupportedEncodingException 
+   */
+  public static <T>T get(RedisCacheEnum cacheKey, Class<T> clz, Object... args) throws UnsupportedEncodingException{
+    String key = getKeyByEnum(cacheKey, args);
+    return get(key, clz);
   }
 	
 	/**

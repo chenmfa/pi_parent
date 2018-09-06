@@ -6,6 +6,7 @@ public enum UcResp {
   RESP_WECHAT_ID_EMPTY(2100102,"UC_USER.WECHAT_CODE_EMPTY", "微信授权为空"),
   RESP_WECHAT_CODE_NOT_CORRECT(2100103,"UC_USER.WECHAT_CODE_NOT_CORRECT", "微信验证码不正确"),
   RESP_USER_ID_EMPTY(2100104,"UC_USER.USER_ID_EMPTY", "用户编号为空"),
+  RESP_USER_NOT_FOUND(2100105,"UC_USER.USER_NOT_FOUND", "用户不存在"),
   ;
   private int errorCode;
   private String tag;

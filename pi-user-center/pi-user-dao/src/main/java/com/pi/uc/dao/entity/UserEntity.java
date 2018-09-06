@@ -5,7 +5,7 @@ import com.pi.comm.entity.BaseEntity;
 /**
  * @description 表user的实体类
  * @author chenmfa
- * @date 2018-09-06 19:33:12
+ * @date 2018-09-07 02:38:20
  */
 public class UserEntity extends BaseEntity{
 	private static final long serialVersionUID = -4972683369271453960L;
@@ -19,6 +19,7 @@ public class UserEntity extends BaseEntity{
 	private String            wxOpenid;           // 微信openid 
 	private String            wxUnionid;          // 微信unionid 
 	private Long              sourceId;           // 用户来源 
+	private String            education;          // 教育程度 
 	private Integer           state;              // 10 正常 20 删除/注销 
 
 	public String getMobile() {
@@ -99,6 +100,14 @@ public class UserEntity extends BaseEntity{
 
 	public void setSourceId(Long sourceId) {
 		this.sourceId=sourceId;
+	}
+
+	public String getEducation() {
+		return this.education;
+	}
+
+	public void setEducation(String education) {
+		this.education=education;
 	}
 
 	public Integer getState() {

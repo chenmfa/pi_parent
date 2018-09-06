@@ -27,6 +27,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.util.PublicSuffixMatcherLoader;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -56,17 +57,34 @@ public class HttpPostUtil {
 	  return JSON.parseObject(response, clz);
 	}
 	
-	public static String post(String url, Map<String, String> paramMap) 
+  public static String postJSON(String url, Map<String, String> paramMap)
+      throws KeyManagementException, UnrecoverableKeyException, 
+      ClientProtocolException, NoSuchAlgorithmException, KeyStoreException, IOException{
+    StringEntity postEntity = new StringEntity(JSON.toJSONString(paramMap));
+    postEntity.setContentEncoding("UTF-8");
+    postEntity.setContentType("application/json");//发送json数据需要设置contentType
+    return post(url, postEntity);
+  }
+  
+  public static String post(String url, Map<String, String> paramMap)
+      throws KeyManagementException, UnrecoverableKeyException, 
+      ClientProtocolException, NoSuchAlgorithmException, KeyStoreException, IOException{
+    logger.debug("请求地址: {}, 请求参数：{}", url, paramMap);
+    List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+    wrapParam(pairs, paramMap);
+    HttpEntity postEntity = new UrlEncodedFormEntity(pairs, CommCharset.UTF_8.getValue());
+    return post(url, postEntity);
+  }
+  
+	public static String post(String url, HttpEntity postEntity) 
 			throws ClientProtocolException, IOException, KeyManagementException,
 			UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException{
-		logger.debug("请求地址: {}, 请求参数：{}", url, paramMap);
+		
 		CloseableHttpClient closeableClient = createHttpsClient();
 		CloseableHttpResponse response = null;
 		try{		  
 		  HttpPost post = new HttpPost(url);
-		  List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-		  wrapParam(pairs, paramMap);
-		  post.setEntity(new UrlEncodedFormEntity(pairs, CommCharset.UTF_8.getValue()));
+		  post.setEntity(postEntity);
 		  response = closeableClient.execute(post);
 		  if(null != response && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
 		    HttpEntity entity = response.getEntity();

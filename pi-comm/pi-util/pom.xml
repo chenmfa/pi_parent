@@ -69,6 +69,16 @@
     <dependency>
         <groupId>redis.clients</groupId>
         <artifactId>jedis</artifactId>
-    </dependency>    
+    </dependency>
+    <dependency>
+        <groupId>jcifs</groupId>
+        <artifactId>jcifs</artifactId>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+    </dependency>      
   </dependencies>
 </project>

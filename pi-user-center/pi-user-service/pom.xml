@@ -17,6 +17,6 @@
       <groupId>com.pi</groupId>
       <artifactId>pi-config-service</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-    </dependency>    
+    </dependency>
   </dependencies>
 </project>
