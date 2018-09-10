@@ -26,7 +26,12 @@ public class ResponseBodyLocalization implements ResponseBodyAdvice<AppResult>{
   private MessageSource messageSource;
   @Override
   public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-    return true;
+    if(null != returnType 
+        && null != returnType.getMethod() 
+        && AppResult.class.getName().equals(returnType.getMethod().getReturnType().getName())){
+      return true;
+    }
+    return false;
   }
 
   @Override
