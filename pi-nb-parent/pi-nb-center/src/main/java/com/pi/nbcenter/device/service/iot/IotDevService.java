@@ -235,6 +235,9 @@ public class IotDevService implements CommonDeviceProvider{
       if(null == updated.getIotDevBattery()){
         updated.setIotDevBattery(BatteryStatus.NONE.value());
       }
+      if(null == updated.getLatestActiveTime()){
+        updated.setLatestActiveTime(cal.getTime());
+      }
       updated.setCreateDate(cal.getTime());
       iotDeviceSessionMapper.insertSelective(updated);
     }else{
