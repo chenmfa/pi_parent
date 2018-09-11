@@ -1,4 +1,4 @@
-package com.pi.stroop.base.response;
+package org.pi.common.http.response;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -9,8 +9,8 @@
      -->
 	    <setting name="mapUnderscoreToCamelCase" value="true"/>
 	</settings>
-<!--   <plugins>
-	 	<plugin interceptor="com.dsm.mybatis.page.interceptor.PageInterceptor" />
-	 	<plugin interceptor="com.dsm.apm.monitor.sql.MybatisSQLExecuteMonitor" />
-	</plugins> --> 
+  <plugins>
+	 	<plugin interceptor="com.pi.base.mybatis.page.interceptor.PageInterceptor" />
+	 	<plugin interceptor="com.pi.base.monitor.sql.MybatisSQLExecuteMonitor" />
+	</plugins> 
 </configuration>
