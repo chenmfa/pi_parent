@@ -89,9 +89,6 @@ public class IotDevService implements CommonDeviceProvider{
     }
     IotPartnerConfig config = 
         partnerService.queryPartnerPlatformConfig(partnerCode, configVersion, IotPartnerConfig.class);
-    if(null == config.getConfigVersion()){
-      throw new ServiceException("PLATFORM_CONFIG.INVALID_CONFIG_VERSION");
-    }
     try {
       iotDeviceId = NbUtil.register(imei, config.getAppId(), config.getAppSecret());
       if(StringUtils.isEmpty(iotDeviceId)){
@@ -470,19 +467,21 @@ public class IotDevService implements CommonDeviceProvider{
   public boolean cleanDeviceInfo(String deviceId) throws Exception{
     checkIotDevId(deviceId);
     IotDeviceInfo dbDevice = queryDBDeviceInfo(deviceId);
-    IotPartnerConfig config = 
-        partnerService.queryPartnerPlatformConfig(
-            dbDevice.getPartnerCode(), dbDevice.getIotProtocolVersion(), IotPartnerConfig.class);
-    AppResult result = NbUtil.deleteDevice(deviceId, config.getAppId(), config.getAppSecret());
-    if(result.equalsSuccess() || 
-        result.getErrorCode() == ErrorIOTPlatform.DEVICE_NOT_EXIST.getCode()){
-      //设置数据为已删除
-      IotDeviceInfo info = new IotDeviceInfo();
-      info.setState(DevState.DEV_DELETED.getState());
-      info.setIotDevId(deviceId);
-      updateDeviceInfoByDevId(info);
-      //添加日志流水
-      return true;
+    if(null != dbDevice){
+      IotPartnerConfig config = 
+          partnerService.queryPartnerPlatformConfig(
+              dbDevice.getPartnerCode(), dbDevice.getIotProtocolVersion(), IotPartnerConfig.class);
+      AppResult result = NbUtil.deleteDevice(deviceId, config.getAppId(), config.getAppSecret());
+      if(result.equalsSuccess() || 
+          result.getErrorCode() == ErrorIOTPlatform.DEVICE_NOT_EXIST.getCode()){
+        //设置数据为已删除
+        IotDeviceInfo info = new IotDeviceInfo();
+        info.setState(DevState.DEV_DELETED.getState());
+        info.setIotDevId(deviceId);
+        updateDeviceInfoByDevId(info);
+        //添加日志流水
+        return true;
+      }
     }
     return false;
   }
@@ -493,10 +492,64 @@ public class IotDevService implements CommonDeviceProvider{
     }
     IotDeviceInfoExample exampleDev = new IotDeviceInfoExample();
     exampleDev.createCriteria().andIotDevIdEqualTo(info.getIotDevId());
-    if(null == info.getUpdateDate()){
-      info.setUpdateDate(new Date());
-    }
+    info.setUpdateDate(new Date());
     return iotDeviceInfoMapper.updateByExampleSelective(info, exampleDev);
+  }
+  
+  /**
+   * @description 升级现有设备到最新协议
+   * @param partnerCode 来源
+   * @param version 版本号
+   * @throws Exception 
+   */
+  public void upgradeOldversionedDevice(Long partnerCode, Integer version) throws Exception {
+    List<IotDeviceInfo> versionedDeviceList = queryVersionedIotDevice(partnerCode, version);
+    if(null != versionedDeviceList && !versionedDeviceList.isEmpty()){
+      StringBuilder deviceIdList = new StringBuilder(versionedDeviceList.size() * 20);
+      for(IotDeviceInfo versionedDevice:versionedDeviceList){
+        //获取当前设备协议(用于删除)
+        IotPartnerConfig config = 
+            partnerService.queryPartnerPlatformConfig(
+                partnerCode, versionedDevice.getIotProtocolVersion(), IotPartnerConfig.class);
+        //删除设备
+        NbUtil.deleteDevice(versionedDevice.getIotDevId(), config.getAppId(), config.getAppSecret());
+      //获取最新平台协议
+        IotPartnerConfig newConfig = 
+            partnerService.queryPartnerPlatformConfig(partnerCode, null, IotPartnerConfig.class);
+//      设备平台注册 
+        String iotDeviceId = NbUtil.register(versionedDevice.getIotDevImei(), newConfig.getAppId(), newConfig.getAppSecret());
+        //      重新绑定注册信息
+        IotDeviceInfo updated = new IotDeviceInfo();
+        updated.setId(versionedDevice.getId());
+        updated.setIotDevId(iotDeviceId);
+        updated.setIotProtocolVersion(newConfig.getConfigVersion());
+        updateDeviceInfoById(updated);
+        deviceIdList.append(versionedDevice.getId());
+        deviceIdList.append(",");
+      }
+      IotPlatformDevEntry entry = new IotPlatformDevEntry();
+      entry.setPlatformDevEntry(deviceIdList.toString());
+      entry.setPlatformDevId(0L);
+      entry.setRemark("批量升级设备");
+      iotPlatformDevEntryService.insertDevEntry(entry);
+      logger.info("升级了{}个设备-{}", versionedDeviceList.size(), deviceIdList.toString());
+    }
+  }
+  
+  private void updateDeviceInfoById(IotDeviceInfo updated){
+    if(null == updated || null == updated.getId()){
+      throw new ServiceException("DEV_INFO.DEV_ID_NOT_FOUND");
+    }
+    updated.setUpdateDate(new Date());
+    iotDeviceInfoMapper.updateByPrimaryKeySelective(updated);
+  }
+  
+  private List<IotDeviceInfo> queryVersionedIotDevice(Long partnerCode, Integer version){
+    IotDeviceInfoExample exampleDev = new IotDeviceInfoExample();
+    exampleDev.createCriteria()
+    .andPartnerCodeEqualTo(partnerCode)
+    .andIotProtocolVersionEqualTo(version);
+    return iotDeviceInfoMapper.selectByExample(exampleDev);
   }
   
   /**
@@ -651,5 +704,4 @@ public class IotDevService implements CommonDeviceProvider{
     checkNbDevID(info.getNbDevId());
     checkDevPartner(info.getPartnerCode());
   }
-  
 }

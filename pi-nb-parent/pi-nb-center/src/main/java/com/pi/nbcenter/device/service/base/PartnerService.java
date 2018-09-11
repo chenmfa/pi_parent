@@ -69,6 +69,9 @@ public class PartnerService {
     List<BasePartnerPlatform> list = queryPartnerPlatform(partnerCode, configVersion);
     List<BasePlatformConfig> configList = 
         platFormService.queryPlatFormConfig(list.get(0).getPlatformId(), list.get(0).getPlatformVersion());
+    if(null == configList || configList.isEmpty()){
+      throw new ServiceException("PLATFORM_CONFIG.INVALID_CONFIG_VERSION");
+    }
     //转换配置信息到指定类
     return wrapPartnerConfig(configList, tClz, partnerCode);
   }

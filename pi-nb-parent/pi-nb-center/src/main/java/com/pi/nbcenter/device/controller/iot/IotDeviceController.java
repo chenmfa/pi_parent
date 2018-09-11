@@ -163,6 +163,13 @@ public class IotDeviceController {
     return AppResult.newSuccessResult("订阅成功", null);
   }
   
+  @PostMapping("/upgrade")
+  public AppResult upgradeOldversionedDevice(Integer version, Long partnerCode) 
+      throws Exception{
+    iotDevService.upgradeOldversionedDevice(partnerCode, version);
+    return AppResult.OK;
+  }
+  
   private void sendInsToDessmann() throws UnknownHostException, IOException{
     String ins = "FE 02 04 00 21 0B DC 7B CB 40 B6 6B 00 00 00 00 00 00 00 00 00 00 00 00 01 DE 02 00 00 00 00 00 18 05 09 17 58 00 05 2B";
     Socket socket = new Socket("118.190.98.192", 8898);
