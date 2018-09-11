@@ -18,5 +18,6 @@
 		<module>pi-util</module>
 		<module>pi-comm-entity</module>
     <module>pi-common-http</module>
+    <module>pi-page-helper</module>
   </modules>
 </project>
