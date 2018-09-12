@@ -34,5 +34,16 @@
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-1.2-api</artifactId>
     </dependency>
+    
+		<dependency>
+		  <groupId>com.github.jsqlparser</groupId>
+		  <artifactId>jsqlparser</artifactId>
+		  <version>1.0</version>
+		</dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+      <version>3.2.0</version>
+    </dependency>		  
   </dependencies>
 </project>
