@@ -1,5 +1,6 @@
 package com.pi.nbcenter.device.service.iot;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.pi.base.contants.SymbolConstants;
 import com.pi.base.dto.result.AppResult;
 import com.pi.base.exception.ServiceException;
 import com.pi.base.util.lang.IntegerUtil;
@@ -530,10 +532,66 @@ public class IotDevService implements CommonDeviceProvider{
       IotPlatformDevEntry entry = new IotPlatformDevEntry();
       entry.setPlatformDevEntry(deviceIdList.toString());
       entry.setPlatformDevId(0L);
+      entry.setUserId(0L);
       entry.setRemark("批量升级设备");
       iotPlatformDevEntryService.insertDevEntry(entry);
       logger.info("升级了{}个设备-{}", versionedDeviceList.size(), deviceIdList.toString());
     }
+  }
+  
+
+  public boolean degradeDevice(Long partnerCode, String devIdList, Integer version) throws Exception{
+    if(StringUtils.isBlank(devIdList)){
+      logger.error("需要降级的设备列表为空，来源：{}-版本：{}", partnerCode, version);
+      return false;
+    }
+    checkDevPartner(partnerCode);
+    chechDegradeVersion(version);
+    String[] preIds = devIdList.split(SymbolConstants.SPLIT_PATTERN);
+    if(null == preIds || preIds.length == 0){
+      logger.error("需要降级的设备列表有误，来源：{}-设备列表数据：{}-版本：{}", partnerCode, devIdList, version);
+      return false;
+    }
+    List<Long> ids = new ArrayList<>();
+    for(String idStr : preIds){
+      try{        
+        Long id = Long.parseLong(idStr);
+        ids.add(id);
+      }catch(Exception e){
+        logger.error("需要降级的设备列表有误，来源：{}-设备列表数据：{}-版本：{}", partnerCode, devIdList, version);
+        return false;
+      }
+    }
+    List<IotDeviceInfo> degradeList = queryIotDeviceByIds(partnerCode, ids);
+    if(null != degradeList && !degradeList.isEmpty()){
+      for(IotDeviceInfo versionedDevice:degradeList){
+        //获取当前设备协议(用于删除)
+        IotPartnerConfig config = 
+            partnerService.queryPartnerPlatformConfig(
+                partnerCode, versionedDevice.getIotProtocolVersion(), IotPartnerConfig.class);
+        //删除设备
+        NbUtil.deleteDevice(versionedDevice.getIotDevId(), config.getAppId(), config.getAppSecret());
+      //获取最新平台协议
+        IotPartnerConfig newConfig = 
+            partnerService.queryPartnerPlatformConfig(partnerCode, version, IotPartnerConfig.class);
+//      设备平台注册 
+        String iotDeviceId = NbUtil.register(versionedDevice.getIotDevImei(), newConfig.getAppId(), newConfig.getAppSecret());
+        //      重新绑定注册信息
+        IotDeviceInfo updated = new IotDeviceInfo();
+        updated.setId(versionedDevice.getId());
+        updated.setIotDevId(iotDeviceId);
+        updated.setIotProtocolVersion(newConfig.getConfigVersion());
+        updateDeviceInfoById(updated);
+      }
+      IotPlatformDevEntry entry = new IotPlatformDevEntry();
+      entry.setPlatformDevEntry(devIdList);
+      entry.setPlatformDevId(0L);
+      entry.setUserId(0L);
+      entry.setRemark("批量降级设备");
+      iotPlatformDevEntryService.insertDevEntry(entry);
+      logger.info("降级了{}个设备-{}", degradeList.size(), devIdList);
+    }
+    return true;
   }
   
   private void updateDeviceInfoById(IotDeviceInfo updated){
@@ -549,6 +607,14 @@ public class IotDevService implements CommonDeviceProvider{
     exampleDev.createCriteria()
     .andPartnerCodeEqualTo(partnerCode)
     .andIotProtocolVersionEqualTo(version);
+    return iotDeviceInfoMapper.selectByExample(exampleDev);
+  }
+  
+  private List<IotDeviceInfo> queryIotDeviceByIds(Long partnerCode, List<Long> ids){
+    IotDeviceInfoExample exampleDev = new IotDeviceInfoExample();
+    exampleDev.createCriteria()
+    .andPartnerCodeEqualTo(partnerCode)
+    .andIdIn(ids);
     return iotDeviceInfoMapper.selectByExample(exampleDev);
   }
   
@@ -668,6 +734,12 @@ public class IotDevService implements CommonDeviceProvider{
       throw new ServiceException(
           ErrorPartner.PARTNER_IS_EMPTY.getKey(),
           ErrorPartner.PARTNER_IS_EMPTY.getCode());
+    }
+  }
+  
+  private void chechDegradeVersion(Integer version){
+    if(null == version || version <= 0){
+      throw new ServiceException("DEV_INFO.DEV_UPGRADE_VERSION_EMPTY");
     }
   }
   

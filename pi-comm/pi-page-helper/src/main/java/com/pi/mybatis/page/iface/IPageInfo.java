@@ -1,4 +1,4 @@
-package com.pi.mybatis.page.model;
+package com.pi.mybatis.page.iface;
 
 public interface IPageInfo {
   public Integer getPageNumber();

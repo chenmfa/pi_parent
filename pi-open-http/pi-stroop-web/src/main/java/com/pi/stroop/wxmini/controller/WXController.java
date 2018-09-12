@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pi.base.dto.result.AppResult;
+import com.pi.stroop.base.controller.BaseController;
 import com.pi.stroop.wxmini.facade.UserFacade;
 import com.pi.stroop.wxmini.vo.UserInfoVo;
 import com.pi.uc.dao.entity.UserEntity;
@@ -17,7 +18,7 @@ import com.pi.uc.service.UcUserService;
 
 @RequestMapping("/")
 @RestController
-public class WXController {
+public class WXController extends BaseController{
   @Autowired
   private UcUserService userService;
   @Autowired
@@ -30,18 +31,19 @@ public class WXController {
   }
   
   @PostMapping("/user/avatar")
-  public AppResult updateUserAvatar(MultipartFile avatar, long loginUserId) throws Exception{
-    return AppResult.newSuccessResult(userService.updateUserAvatar(avatar,loginUserId));
+  public AppResult updateUserAvatar(MultipartFile avatar) throws Exception{
+    return AppResult.newSuccessResult(userService.updateUserAvatar(avatar, getLoginUserId()));
   }
   
   @PostMapping("/user/info")
   public AppResult updateUserInfo(UserPostForm user){
+    user.setLoginUserId(getLoginUserId());
     userService.updateUserInfo(user);
     return AppResult.OK;
   }
   @GetMapping
-  public AppResult getUserInfo(long loginUserId){
-    UserEntity entity = userService.queryUserInfo(loginUserId);
+  public AppResult getUserInfo(){
+    UserEntity entity = userService.queryUserInfo(getLoginUserId());
     UserInfoVo vo = userFacade.convertUserEntityToVo(entity);
     return AppResult.newSuccessResult(vo);
   }

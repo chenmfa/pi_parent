@@ -15,7 +15,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pi.mybatis.page.model.IPageInfo;
+import com.pi.mybatis.page.iface.IPageInfo;
 
 @Intercepts(value = {
     @Signature(type=Executor.class, method="query", 

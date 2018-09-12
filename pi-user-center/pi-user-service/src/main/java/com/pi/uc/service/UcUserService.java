@@ -71,7 +71,7 @@ public class UcUserService {
   }
   
   public String updateUserAvatar(MultipartFile file,
-      @NotNull(message="UC_USER.USER_ID_EMPTY") long userId) throws Exception{
+      @NotNull(message="UC_USER.USER_ID_EMPTY") Long userId) throws Exception{
     validFileSource(file);
     //查询用户信息
     UserEntity entity = queryUserInfo(userId);
@@ -97,7 +97,7 @@ public class UcUserService {
     }
   }
   
-  public UserEntity queryUserInfo(@NotNull(message="UC_USER.USER_ID_EMPTY") long userId){
+  public UserEntity queryUserInfo(@NotNull(message="UC_USER.USER_ID_EMPTY") Long userId){
     UserEntity entity = userMapper.findOne(userId);
     if(null == entity){
       throw new ServiceException(

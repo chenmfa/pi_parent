@@ -38,6 +38,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ServletComponentScan
 @ComponentScan("com.pi")
 @MapperScan(basePackages={"com.pi"})
+//@EnableRedisHttpSession
 public class StroopBootStrap {
   public static final Logger logger = LoggerFactory.getLogger(StroopBootStrap.class);
   public static ApplicationContext CONTEXT = null;

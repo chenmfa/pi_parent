@@ -6,23 +6,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pi.base.dto.result.AppResult;
+import com.pi.stroop.base.controller.BaseController;
 import com.pi.stroop.service.StroopInvitationService;
 
 @RestController
-public class ShareController {
+public class ShareController extends BaseController{
   
   @Autowired
   StroopInvitationService invitationService;
   
   @PostMapping
-  public AppResult bindShare(long inviterId, long loginUserId){
-    invitationService.share(inviterId, loginUserId);
+  public AppResult bindShare(long inviterId){
+    invitationService.share(inviterId, getLoginUserId());
     return AppResult.OK;
   }
   
   @GetMapping
-  public AppResult getQrCode(long loginUserId) throws Exception{
-    String url = invitationService.getShareQrcode(loginUserId);
+  public AppResult getQrCode() throws Exception{
+    String url = invitationService.getShareQrcode(getLoginUserId());
     return AppResult.newSuccessResult(url);
   }
 }
