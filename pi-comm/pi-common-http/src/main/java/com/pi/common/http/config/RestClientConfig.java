@@ -1,4 +1,4 @@
-package org.pi.common.http.config;
+package com.pi.common.http.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

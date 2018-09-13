@@ -6,8 +6,8 @@
         <console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%p] [%c] %m%n"/><!-- %d %p [%c] - %m%n -->
         </console>
-        <RollingFile name="RollingFileInfo" fileName="/home/data/log/msg_center/msg_center_info.log"
-        	filePattern="/home/data/log/msg_center/msg_center_info-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileInfo" fileName="/home/data/log/stroop/stroop_info.log"
+        	filePattern="/home/data/log/stroop/stroop_info-%d{yyyy-MM-dd}-%i.log">
          <Filters>
 	          <ThresholdFilter level="INFO" onMatch="ACCEPT"/>
 	          <!-- <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="ACCEPT"/> -->
@@ -18,8 +18,8 @@
              <SizeBasedTriggeringPolicy size="50 MB"/>
          </Policies>
         </RollingFile>
-        <RollingFile name="RollingFileDebug" fileName="/home/data/log/msg_center/msg_center_debug.log"
-                     filePattern="/home/data/log/msg_center/msg_center_debug-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileDebug" fileName="/home/data/log/stroop/stroop_debug.log"
+                     filePattern="/home/data/log/stroop/stroop_debug-%d{yyyy-MM-dd}-%i.log">
             <Filters>
                 <ThresholdFilter level="DEBUG"/>
             </Filters>
@@ -29,8 +29,8 @@
                 <SizeBasedTriggeringPolicy size="50 MB"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="RollingFileError" fileName="/home/data/log/msg_center/msg_center_error.log"
-                     filePattern="/home/data/log/msg_center/msg_center_error-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileError" fileName="/home/data/log/stroop/stroop_error.log"
+                     filePattern="/home/data/log/stroop/stroop_error-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="ERROR"/>
             <PatternLayout charset="UTF-8" pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%p] [%c] %m%n"/>
             <Policies>
@@ -55,7 +55,7 @@
 				<logger name = "java.sql.PreparedStatement" level="INFO"></logger>
 				<logger name = "java.sql.ResultSet" level="INFO"></logger>                
         <logger name="com.pi" level="debug"></logger>
-        <logger name="com.pi.nbcenter.device.mapper" level="info"></logger>
+        <logger name="com.pi.**.dao" level="info"></logger>
         <!-- druid配置 -->
         <logger name="druid.sql.Statement" level="info" additivity="false">
             <appender-ref ref="Console"/>

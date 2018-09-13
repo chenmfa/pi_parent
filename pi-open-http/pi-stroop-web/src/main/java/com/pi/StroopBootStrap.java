@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
@@ -38,6 +39,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ServletComponentScan
 @ComponentScan("com.pi")
 @MapperScan(basePackages={"com.pi"})
+//@EnableAutoConfiguration
 //@EnableRedisHttpSession
 public class StroopBootStrap {
   public static final Logger logger = LoggerFactory.getLogger(StroopBootStrap.class);

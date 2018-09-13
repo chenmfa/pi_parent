@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pi.base.dto.result.AppResult;
+import com.pi.common.http.annotation.InterceptorIgnore;
 import com.pi.stroop.base.controller.BaseController;
 import com.pi.stroop.wxmini.facade.UserFacade;
 import com.pi.stroop.wxmini.vo.UserInfoVo;
@@ -16,7 +17,7 @@ import com.pi.uc.dao.entity.UserEntity;
 import com.pi.uc.model.user.UserPostForm;
 import com.pi.uc.service.UcUserService;
 
-@RequestMapping("/")
+@RequestMapping("/user")
 @RestController
 public class WXController extends BaseController{
   @Autowired
@@ -24,24 +25,26 @@ public class WXController extends BaseController{
   @Autowired
   private UserFacade userFacade;
   
-  @RequestMapping("/user/weChatBind")
+  @InterceptorIgnore(desc = "微信绑定登陆")
+  @RequestMapping("/weChatBind")
   public AppResult weChatBind(Long sourceId, String wxCode) throws Exception{
     String token = userService.bindWeChat(sourceId, wxCode);
     return AppResult.newSuccessResult(token);
   }
   
-  @PostMapping("/user/avatar")
+  @PostMapping("/avatar")
   public AppResult updateUserAvatar(MultipartFile avatar) throws Exception{
     return AppResult.newSuccessResult(userService.updateUserAvatar(avatar, getLoginUserId()));
   }
   
-  @PostMapping("/user/info")
+  @PostMapping("/info")
   public AppResult updateUserInfo(UserPostForm user){
     user.setLoginUserId(getLoginUserId());
     userService.updateUserInfo(user);
     return AppResult.OK;
   }
-  @GetMapping
+  
+  @GetMapping("/getUserInfo")
   public AppResult getUserInfo(){
     UserEntity entity = userService.queryUserInfo(getLoginUserId());
     UserInfoVo vo = userFacade.convertUserEntityToVo(entity);

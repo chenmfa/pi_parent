@@ -1,4 +1,4 @@
-package com.pi.stroop.base.controller;
+package com.pi.stroop.base.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -6,20 +6,27 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.pi.base.dto.result.respcode.error.ErrorServer;
 import com.pi.base.enumerate.redis.RedisCacheEnum;
 import com.pi.base.exception.ServiceException;
 import com.pi.base.util.cache.RedisUtil;
+import com.pi.common.http.annotation.InterceptorIgnore;
 import com.pi.stroop.base.constants.StroopConstants;
 import com.pi.uc.dao.entity.UserEntity;
 
-public class AuthInterceptor implements HandlerInterceptor{
+public class AuthInterceptor extends HandlerInterceptorAdapter{
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+      throws Exception {
+    HandlerMethod method = (HandlerMethod)handler;
+    InterceptorIgnore ignoreAnno = method.getMethodAnnotation(InterceptorIgnore.class);
+    if(null != ignoreAnno && ignoreAnno.value()){
+      return true;
+    }
     String token = getRequest().getParameter("token");
     if(StringUtils.isBlank(token)){
       throw new ServiceException(
@@ -34,18 +41,6 @@ public class AuthInterceptor implements HandlerInterceptor{
     }
     request.setAttribute(StroopConstants.REQUEST_USER_ATTR, userSession);
     return true;
-  }
-
-  @Override
-  public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-      ModelAndView modelAndView) throws Exception {
-    
-  }
-
-  @Override
-  public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-      throws Exception {
-    
   }
   
   private HttpServletRequest getRequest(){

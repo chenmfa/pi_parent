@@ -1,4 +1,4 @@
-package org.pi.common.http.response;
+package com.pi.common.http.response;
 
 import java.util.Locale;
 
