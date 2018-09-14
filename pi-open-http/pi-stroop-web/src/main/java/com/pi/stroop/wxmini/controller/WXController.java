@@ -1,6 +1,8 @@
 package com.pi.stroop.wxmini.controller;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,7 @@ import com.pi.uc.service.UcUserService;
 @RequestMapping("/user")
 @RestController
 public class WXController extends BaseController{
+  private static final Logger logger = LoggerFactory.getLogger(WXController.class);
   @Autowired
   private UcUserService userService;
   @Autowired
@@ -28,6 +31,7 @@ public class WXController extends BaseController{
   @InterceptorIgnore(desc = "微信绑定登陆")
   @RequestMapping("/weChatBind")
   public AppResult weChatBind(Long sourceId, String wxCode) throws Exception{
+    logger.debug("[微信绑定登陆] 来源:{}, 校验码：{}", sourceId, wxCode);
     String token = userService.bindWeChat(sourceId, wxCode);
     return AppResult.newSuccessResult(token);
   }
@@ -39,6 +43,7 @@ public class WXController extends BaseController{
   
   @PostMapping("/info")
   public AppResult updateUserInfo(UserPostForm user){
+    logger.debug("[修改用户信息] 来源:{}, 校验码：{}");
     user.setLoginUserId(getLoginUserId());
     userService.updateUserInfo(user);
     return AppResult.OK;

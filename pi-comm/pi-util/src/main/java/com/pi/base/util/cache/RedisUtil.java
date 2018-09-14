@@ -774,6 +774,16 @@ public class RedisUtil {
     }
   }
  }
+ /**
+  * @description 删除缓存中某个键的值
+  * @param key
+  * @param value 
+  * @return
+  */
+ public static long del(RedisCacheEnum cacheKey, Object...args){
+   String key = getKeyByEnum(cacheKey, args);
+   return del(key);
+ }
  
  private static String getKeyByEnum(RedisCacheEnum cacheKey, Object... args){
    if(null == args || args.length == 0)

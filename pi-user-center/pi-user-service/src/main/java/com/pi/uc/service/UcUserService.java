@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,8 +33,7 @@ import com.pi.uc.dao.entity.UserEntity;
 import com.pi.uc.dao.mapper.UserMapper;
 import com.pi.uc.dao.param.UserParam;
 import com.pi.uc.model.user.UserPostForm;
-import com.pi.uc.model.wx.WxUserBaseInfo;
-import com.pi.uc.model.wx.WxUserInfo;
+import com.pi.uc.model.wx.mini.WxMiniAuthInfo;
 import com.pi.uc.util.TokenUtil;
 
 @Validated
@@ -62,7 +60,7 @@ public class UcUserService {
     //查询app配置
     PartnerAppConfig config = configService.queryPartnerAppConfig(sourceId);
     //校验授权
-    WxUserInfo wxUserInfo = validWxAuthorization(wxCode, config);
+    WxMiniAuthInfo wxUserInfo = validWxAuthorization(wxCode, config);
     //获取用户信息
     UserEntity entity = createIfNotExistUser(wxUserInfo, sourceId);
     //保存登录会话
@@ -128,21 +126,19 @@ public class UcUserService {
     return url;
   }
   
-  private UserEntity createIfNotExistUser(WxUserInfo wxUserInfo, long sourceId) {
+  private UserEntity createIfNotExistUser(WxMiniAuthInfo wxUserInfo, long sourceId) {
     UserParam param = new UserParam();
     param.setWxOpenid(wxUserInfo.getOpenid());
-    if(StringUtils.isNotBlank(wxUserInfo.getUnionid())){
-      param.setWxUnionid(wxUserInfo.getUnionid());
+    if(StringUtils.isNotBlank(wxUserInfo.getUinionid())){
+      param.setWxUnionid(wxUserInfo.getUinionid());
     }else{
-      wxUserInfo.setUnionid("");
+      wxUserInfo.setUinionid("");;
     }
     param.setState(RecordState.STATE_NORMAL.getCode());
     List<UserEntity> userList = userMapper.findList(param);
     UserEntity entity;
     if(null != userList && !userList.isEmpty()){
       entity = userList.get(0);
-      entity.setNickName(wxUserInfo.getNickname());
-      entity.setAvatar(wxUserInfo.getHeadimgurl());
       userMapper.updateById(entity);
     }else{
       entity = translateWxUserInfoToEntity(wxUserInfo);
@@ -152,70 +148,47 @@ public class UcUserService {
     return entity;
   }
   
-  private UserEntity translateWxUserInfoToEntity(WxUserInfo wxUserInfo){
+  private UserEntity translateWxUserInfoToEntity(WxMiniAuthInfo wxUserInfo){
     UserEntity entity = new UserEntity();
     entity.setAge(0);
+    entity.setSex(1);
     entity.setMobile("");
-    entity.setName(wxUserInfo.getNickname());
-    entity.setNickName(wxUserInfo.getNickname());
+    entity.setName("");
+    entity.setNickName("");
     entity.setPassword("");    
     entity.setState(RecordState.STATE_NORMAL.getCode());
     entity.setWxOpenid(wxUserInfo.getOpenid());
-    entity.setAvatar(wxUserInfo.getHeadimgurl());
-    entity.setWxUnionid(wxUserInfo.getUnionid());
+    entity.setAvatar("");
+    entity.setEducation("");
+    entity.setWxUnionid(wxUserInfo.getUinionid());
     return entity;
   }
   
-  private WxUserInfo validWxAuthorization(String wxCode, PartnerAppConfig config)
+  private WxMiniAuthInfo validWxAuthorization(String wxCode, PartnerAppConfig config)
       throws Exception{
-    WxUserBaseInfo baseInfo = HttpPostUtil.getRestResult(
+    WxMiniAuthInfo baseInfo = HttpPostUtil.getRestResult(
         MessageFormat.format(
-            WxConstants.WCHAT_OPENID_PATTERN, 
+            WxConstants.WCHAT_MINI_OPENID_PATTERN, 
             config.getAppId(), 
             config.getAppSecret(), 
             wxCode), 
-        null, WxUserBaseInfo.class);
+        null, WxMiniAuthInfo.class);
     checkWeChatAuth(baseInfo, new Object[]{config.getAppId(), config.getAppSecret(), wxCode}, wxCode);
-    
-//  刷新用户授权并尝试获取unionid
-    WxUserBaseInfo refreshInfo = HttpPostUtil.getRestResult(
-        String.format(
-            WxConstants.WCHAT_REFRESH_TOKEN_PATTERN, 
-            config.getAppId(), 
-            baseInfo.getRefresh_token()), 
-        null, WxUserBaseInfo.class);
-    checkWeChatAuth(refreshInfo, new Object[]{config.getAppId(), config.getAppSecret(), wxCode}, wxCode);
-    refreshInfo.setUnionid(baseInfo.getUnionid());
-    BeanUtils.copyProperties(baseInfo, refreshInfo);
-    
-// 获取微信用户信息   
-    WxUserInfo wxUserInfo = HttpPostUtil.getRestResult(
-        String.format(WxConstants.WCHAT_USER_INFO_PATTERN, baseInfo.getAccess_token(), baseInfo.getOpenid()),
-        null, WxUserInfo.class);
-    checkWeChatAuth(wxUserInfo, new Object[]{baseInfo.getAccess_token(), baseInfo.getOpenid()}, wxCode);
     
 //  设备缓存
     RedisUtil.directset(
         RedisCacheEnum.USER_WX_INFO, 
-        JSON.toJSONString(baseInfo), 
-        baseInfo.getExpires_in(), 
+        JSON.toJSONString(baseInfo),
         new Object[]{baseInfo.getOpenid()});
-    wxUserInfo.setUnionid(baseInfo.getUnionid());
-    return wxUserInfo;
+    return baseInfo;
   }
   
   
-  private void checkWeChatAuth(WxUserBaseInfo userInfo, Object[] param, String wxCode){
-    if(null == userInfo || null == userInfo.getAccess_token() ||null == userInfo.getRefresh_token()){
+  private void checkWeChatAuth(WxMiniAuthInfo userInfo, Object[] param, String wxCode){
+    if(null == userInfo 
+        || (null != userInfo.getErrcode() && userInfo.getErrcode()>0)){
       logger.error("获取用户授权失败, 请求参数为: {}, 授权码:{}", MessageFormat.format(
           WxConstants.WCHAT_OPENID_PATTERN, param), wxCode);
-      throw new ServiceException("USERACTION.WECHAT_AUTH_FAILED");
-    }
-  }
-  private void checkWeChatAuth(WxUserInfo userInfo, Object[] param, String wxCode){
-    if(null == userInfo){
-      logger.error("获取用户信息失败, 请求参数为: {}, 授权码:{}", 
-          MessageFormat.format(WxConstants.WCHAT_USER_INFO_PATTERN, param), wxCode);
       throw new ServiceException("USERACTION.WECHAT_AUTH_FAILED");
     }
   }

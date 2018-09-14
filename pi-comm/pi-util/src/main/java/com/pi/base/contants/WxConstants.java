@@ -3,7 +3,8 @@ package com.pi.base.contants;
 public class WxConstants {
   public static final String WCHAT_OPENID_PATTERN = 
       "https://api.weixin.qq.com/sns/oauth2/access_token?appid={0}&secret={1}&code={2}&grant_type=authorization_code";
-  
+  public static final String WCHAT_MINI_OPENID_PATTERN =
+      "https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code";
   public static final String WCHAT_USER_INFO_PATTERN =
       "https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}&lang=zh_CN";
   

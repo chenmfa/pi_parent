@@ -23,17 +23,24 @@ public class TokenUtil {
    * @description 去除了ip来源并加入了tokenVersion字段
    * {@link ServerConstants#TOKEN_VERSION}
    * @return
+	 * @throws Exception 
    */
-  public static String getUserToken(UserEntity user){
+  public static String getUserToken(UserEntity user) throws Exception{
   	validateUser(user);
-
-//	设置redis的用户信息		
-  	String token = StringUtil.generateNonce(32);
+    //查询用户是否有会话
+  	String storedToken = RedisUtil.get(RedisCacheEnum.USER_LOGIN_TOKEN, new Object[]{user.getId()});
+		
+  	//暂时只允许一处登陆
+  	if(StringUtils.isNotBlank(storedToken)){
+  	  RedisUtil.del(RedisCacheEnum.USER_LOGIN_SESSION, storedToken);
+  	}
+ // 设置新的redis用户信息
+  	storedToken = StringUtil.generateNonce(32);;
 		RedisUtil.directset(RedisCacheEnum.USER_LOGIN_SESSION,
-				JSON.toJSONString(user), getTokenValidity(user.getSourceId()), new Object[]{token});
+				JSON.toJSONString(user), getTokenValidity(user.getSourceId()), new Object[]{storedToken});
     RedisUtil.directset(RedisCacheEnum.USER_LOGIN_TOKEN,
-        JSON.toJSONString(user), getTokenValidity(user.getSourceId()), new Object[]{user.getId()});
-    return token;
+        storedToken, getTokenValidity(user.getSourceId()), new Object[]{user.getId()});
+    return storedToken;
   }
   /**
    * @description 根据token获取登陆时的会话信息
