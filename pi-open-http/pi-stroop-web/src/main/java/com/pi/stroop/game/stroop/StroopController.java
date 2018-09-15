@@ -1,21 +1,34 @@
-package com.pi.stroop.game;
+package com.pi.stroop.game.stroop;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.pi.base.dto.result.AppResult;
+import com.pi.stroop.base.controller.BaseController;
+import com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity;
+import com.pi.stroop.service.StroopDiagnosisService;
 
-public class StroopController {
+@RestController
+public class StroopController extends BaseController{
+  
+  @Autowired
+  StroopDiagnosisService diagnosisService;
   
   @PostMapping("/user/diagnosis")
   public AppResult postDiagnosisResult(){
     return null;
   }
-  
+ // r06i62qcuzwbi73awxbuy5r3rr1lbgfh
   @RequestMapping("/user/diagnosis/history")
   public AppResult getDiagnosisHistory(){
-    return null;
+    List<StroopDiagnosisHistoryEntity> diagnosisList = 
+        diagnosisService.queryUserDiagnosisHistory(getLoginUserId());
+    return AppResult.newSuccessResult(diagnosisList);
   }
   
   @RequestMapping("/user/diagnosis/detail")

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
 import com.pi.base.dto.result.AppResult;
 import com.pi.common.http.annotation.InterceptorIgnore;
 import com.pi.stroop.base.controller.BaseController;
@@ -17,6 +18,7 @@ import com.pi.stroop.wxmini.facade.UserFacade;
 import com.pi.stroop.wxmini.vo.UserInfoVo;
 import com.pi.uc.dao.entity.UserEntity;
 import com.pi.uc.model.user.UserPostForm;
+import com.pi.uc.model.userlogin.UserLoginPostForm;
 import com.pi.uc.service.UcUserService;
 
 @RequestMapping("/user")
@@ -30,9 +32,9 @@ public class WXController extends BaseController{
   
   @InterceptorIgnore(desc = "微信绑定登陆")
   @RequestMapping("/weChatBind")
-  public AppResult weChatBind(Long sourceId, String wxCode) throws Exception{
-    logger.debug("[微信绑定登陆] 来源:{}, 校验码：{}", sourceId, wxCode);
-    String token = userService.bindWeChat(sourceId, wxCode);
+  public AppResult weChatBind(UserLoginPostForm user) throws Exception{
+    logger.debug("[微信绑定登陆] 来源:{}, 校验码：{}", user.toString());
+    String token = userService.bindWeChat(user);
     return AppResult.newSuccessResult(token);
   }
   
@@ -43,14 +45,15 @@ public class WXController extends BaseController{
   
   @PostMapping("/info")
   public AppResult updateUserInfo(UserPostForm user){
-    logger.debug("[修改用户信息] 来源:{}, 校验码：{}");
+    logger.debug("[修改用户信息] 内容为：{}", JSON.toJSONString(user));
     user.setLoginUserId(getLoginUserId());
     userService.updateUserInfo(user);
     return AppResult.OK;
   }
   
-  @GetMapping("/getUserInfo")
+  @GetMapping("/info")
   public AppResult getUserInfo(){
+    logger.debug("[获取用户信息] 当前用户为为：{}", getLoginUserId());
     UserEntity entity = userService.queryUserInfo(getLoginUserId());
     UserInfoVo vo = userFacade.convertUserEntityToVo(entity);
     return AppResult.newSuccessResult(vo);

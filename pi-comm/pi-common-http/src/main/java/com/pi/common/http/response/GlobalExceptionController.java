@@ -23,7 +23,7 @@ public class GlobalExceptionController {
   @ExceptionHandler(value = Exception.class)
   public AppResult handleException(HttpServletRequest request, HttpServletResponse response, 
       Object handler, Exception e){
-    logger.error(e.getMessage());
+    logger.error(e.getMessage(),e);
     return AppResult.newFailResult(
         ErrorServer.REQUEST_OPERATION_UNAVAILABLE.getTag(),
         ErrorServer.REQUEST_OPERATION_UNAVAILABLE.getErrorCode());

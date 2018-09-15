@@ -1,4 +1,4 @@
-package com.pi.nbcenter.device.service.iot;
+package com.pi.nbcenter.device.service.pi.internal;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,16 +39,20 @@ import com.pi.nbcenter.device.entity.auto.IotDeviceSessionExample;
 import com.pi.nbcenter.device.entity.auto.IotPlatformDevEntry;
 import com.pi.nbcenter.device.mapper.auto.IotDeviceInfoMapper;
 import com.pi.nbcenter.device.mapper.auto.IotDeviceSessionMapper;
-import com.pi.nbcenter.device.service.base.IotPlatformDevEntryService;
-import com.pi.nbcenter.device.service.base.PartnerService;
-import com.pi.nbcenter.device.service.provider.CommonDeviceProvider;
+import com.pi.nbcenter.device.service.partner.PartnerService;
+import com.pi.nbcenter.device.service.provider.CommonDeviceService;
 import com.pi.nbcenter.util.comm.ObjectUtil;
-import com.pi.nbcenter.util.nb.NbUtil;
+import com.pi.nbcenter.util.nb.HuaWeiIotService;
 
+
+/**
+ * @description 这个是设备中心的公共基础类，当调用其他平台操作完成时, 调用此接口回填数据库
+ * @author chenmfa
+ */
 @Partner(name={"HDU", "SNAIL", "JINHUA_TELECOM", "TIANJIANG", "GUANG" })
 @Service("nbService")
-public class IotDevService implements CommonDeviceProvider{
-  private static final Logger logger = LoggerFactory.getLogger(IotDevService.class);
+public class PiIotDevService implements CommonDeviceService{
+  private static final Logger logger = LoggerFactory.getLogger(PiIotDevService.class);
  
   @Autowired
   private IotDeviceInfoMapper iotDeviceInfoMapper;
@@ -60,6 +64,8 @@ public class IotDevService implements CommonDeviceProvider{
   private DeviceCallBackFacade deviceCallBackFacade;
   @Autowired
   private IotPlatformDevEntryService iotPlatformDevEntryService;
+  @Autowired
+  private HuaWeiIotService iotPlatService;
   /**
    * @description 设备添加
    * @param imei 设备IMEI
@@ -77,7 +83,7 @@ public class IotDevService implements CommonDeviceProvider{
     String iotDeviceId = null;
     Integer configVersion;
     //查询设备是否注册
-    IotDeviceInfo info =  queryIotDeviceInfoByImei(imei);
+    IotDeviceInfo info =  queryDbDeviceInfoByImeiIfExist(imei);
     if(null != info){
       //注销平台设备
       cleanDeviceInfo(info.getIotDevId());
@@ -92,7 +98,7 @@ public class IotDevService implements CommonDeviceProvider{
     IotPartnerConfig config = 
         partnerService.queryPartnerPlatformConfig(partnerCode, configVersion, IotPartnerConfig.class);
     try {
-      iotDeviceId = NbUtil.register(imei, config.getAppId(), config.getAppSecret());
+      iotDeviceId = iotPlatService.register(imei, config.getAppId(), config.getAppSecret());
       if(StringUtils.isEmpty(iotDeviceId)){
         result = AppResult.newFailResult(
             ErrorIOTDev.REG_DEV_FROM_PLAT_FAILED.getKey(),
@@ -100,14 +106,14 @@ public class IotDevService implements CommonDeviceProvider{
       }else{
         info.setIotDevId(iotDeviceId);
         //注册厂商信息
-        boolean succeed = NbUtil.updateDevice(iotDeviceId, "", config);
+        boolean succeed = iotPlatService.updateDevice(iotDeviceId, "", config);
         if(!succeed){
           result = AppResult.newFailResult(ErrorIOTDev.REG_MANUFACTURER_FAILED.getKey(),
               ErrorIOTDev.REG_MANUFACTURER_FAILED.getCode());
         }else{
           //设置证书
           info.setIotDevRegcode(Integer.parseInt(IntegerUtil.generateRandomCode(9))+1000000000);
-          NbUtil.setCert(iotDeviceId, info.getIotDevRegcode(), "ge/ad8XT1takmr4STDqV5A==",
+          iotPlatService.setCert(iotDeviceId, info.getIotDevRegcode(), "ge/ad8XT1takmr4STDqV5A==",
               config.getAppId(), config.getAppSecret());
           info.setIotDevImei(imei);
           info.setCreateDate(new Date());
@@ -138,7 +144,7 @@ public class IotDevService implements CommonDeviceProvider{
       //对于注册成功但是添加失败或者其他异常情况，需要清空设备表数据
       if(null != iotDeviceId){
         try {
-          NbUtil.deleteDevice(iotDeviceId, config.getAppId(), config.getAppSecret());
+          iotPlatService.deleteDevice(iotDeviceId, config.getAppId(), config.getAppSecret());
         } catch (Exception e1) {
           logger.error("注销平台设备失败",e);
         }
@@ -157,7 +163,7 @@ public class IotDevService implements CommonDeviceProvider{
       iotDeviceInfoMapper.updateByPrimaryKeySelective(info);
       return info.getId();
     }
-    IotDeviceInfo deviceInfo = queryIotDeviceInfoByImei(info.getIotDevImei());
+    IotDeviceInfo deviceInfo = queryDbDeviceInfoByImeiIfExist(info.getIotDevImei());
     if(null != deviceInfo){
       //需要更新
       info.setId(deviceInfo.getId());
@@ -252,8 +258,7 @@ public class IotDevService implements CommonDeviceProvider{
    */
   public IotDevInstantInfo queryDeviceStatus(String imei){
     //根据imei查询设备的平台id
-    IotDeviceInfo info = queryIotDeviceInfoByImei(imei);
-    checkDevInfo(info);
+    IotDeviceInfo info = queryDbDeviceInfoByImei(imei);
     IotDevInstantInfo instant = queryIotDevInstantInfoByDevId(info.getIotDevId());
     instant.setImsi(info.getIotDevImsi());
     return instant;
@@ -373,16 +378,13 @@ public class IotDevService implements CommonDeviceProvider{
   
   public AppResult remoteOpenLock(String imei) throws Exception {
     AppResult result;
-    IotDeviceInfo info = queryIotDeviceInfoByImei(imei);
-    if(null == info){
-      return AppResult.newFailResult("设备不存在");
-    }  
+    IotDeviceInfo info = queryDbDeviceInfoByImeiIfExist(imei);
     IotPartnerConfig config = 
         partnerService.queryPartnerPlatformConfig(info.getPartnerCode(), 
             info.getIotProtocolVersion(), IotPartnerConfig.class);
     String response;
     try {
-      response = NbUtil.openLock(info.getIotDevId(), "ge/ad8XT1takmr4STDqV5A==",
+      response = iotPlatService.openLock(info.getIotDevId(), "ge/ad8XT1takmr4STDqV5A==",
           config.getAppId(), config.getAppSecret());
       if(StringUtils.isEmpty(response)){
         result = AppResult.newFailResult("远程开门失败");
@@ -409,13 +411,43 @@ public class IotDevService implements CommonDeviceProvider{
    * @param imei
    * @return
    */
-  public IotDeviceInfo queryIotDeviceInfoByImei(String imei){
+  public IotDeviceInfo queryDbDeviceInfoByImei(String imei){
+    IotDeviceInfo deviceInfo = queryDbDeviceInfoByImeiIfExist(imei);
+    checkDevInfo(deviceInfo);
+    return deviceInfo;
+  }
+  /**
+   * @description 根据imei查询设备信息
+   * @param imei
+   * @return
+   */
+  public IotDeviceInfo queryDbDeviceInfoByImeiIfExist(String imei){
     checkImei(imei);
     IotDeviceInfoExample example = new IotDeviceInfoExample();
     example.createCriteria().andIotDevImeiEqualTo(imei);
     return ObjectUtil.getOne(iotDeviceInfoMapper.selectByExample(example));
   }
-  
+  /**
+   * @description 根据imei查询设备信息
+   * @param imei
+   * @return
+   */
+  public IotDeviceInfo queryDbDeviceInfoByImei(String imei, Long sourceId){
+    IotDeviceInfo deviceInfo = queryDbDeviceInfoByImeiIfExist(imei, sourceId);
+    checkDevInfo(deviceInfo);
+    return deviceInfo;
+  }
+  /**
+   * @description 根据imei查询设备信息
+   * @param imei
+   * @return
+   */
+  public IotDeviceInfo queryDbDeviceInfoByImeiIfExist(String imei, Long sourceId){
+    checkImei(imei);
+    IotDeviceInfoExample example = new IotDeviceInfoExample();
+    example.createCriteria().andIotDevImeiEqualTo(imei).andPartnerCodeEqualTo(sourceId);
+    return ObjectUtil.getOne(iotDeviceInfoMapper.selectByExample(example));
+  }
   /**
    * @description 根据deviceId查询设备信息
    * @param deviceId
@@ -430,11 +462,9 @@ public class IotDevService implements CommonDeviceProvider{
     return ObjectUtil.getOne(iotDeviceInfoMapper.selectByExample(example));
   }
   
-  
   public IotDeviceInfoDTO queryPlatDeviceInfoByImei(String imei){
     checkImei(imei);
-    IotDeviceInfo info = queryIotDeviceInfoByImei(imei);
-    checkDevInfo(info);
+    IotDeviceInfo info = queryDbDeviceInfoByImei(imei);
     return queryPlatDeviceInfo(info);
   }
   /**
@@ -447,7 +477,7 @@ public class IotDevService implements CommonDeviceProvider{
       IotPartnerConfig config = 
           partnerService.queryPartnerPlatformConfig(
               info.getPartnerCode(), info.getIotProtocolVersion(), IotPartnerConfig.class);
-      AppResult result = NbUtil.getDeviceInfo(info.getIotDevId(), config.getAppId(), config.getAppSecret());
+      AppResult result = iotPlatService.getDeviceInfo(info.getIotDevId(), config.getAppId(), config.getAppSecret());
       if(null != result && result.equalsFail() && 
           result.getErrorCode() == ErrorIOTPlatform.DEVICE_NOT_EXIST.getCode()){
         testAndCleanDevSessionInfo(info.getIotDevId());//如果返回设备不存在,则删除设备在线信息
@@ -473,7 +503,7 @@ public class IotDevService implements CommonDeviceProvider{
       IotPartnerConfig config = 
           partnerService.queryPartnerPlatformConfig(
               dbDevice.getPartnerCode(), dbDevice.getIotProtocolVersion(), IotPartnerConfig.class);
-      AppResult result = NbUtil.deleteDevice(deviceId, config.getAppId(), config.getAppSecret());
+      AppResult result = iotPlatService.deleteDevice(deviceId, config.getAppId(), config.getAppSecret());
       if(result.equalsSuccess() || 
           result.getErrorCode() == ErrorIOTPlatform.DEVICE_NOT_EXIST.getCode()){
         //设置数据为已删除
@@ -514,12 +544,12 @@ public class IotDevService implements CommonDeviceProvider{
             partnerService.queryPartnerPlatformConfig(
                 partnerCode, versionedDevice.getIotProtocolVersion(), IotPartnerConfig.class);
         //删除设备
-        NbUtil.deleteDevice(versionedDevice.getIotDevId(), config.getAppId(), config.getAppSecret());
+        iotPlatService.deleteDevice(versionedDevice.getIotDevId(), config.getAppId(), config.getAppSecret());
       //获取最新平台协议
         IotPartnerConfig newConfig = 
             partnerService.queryPartnerPlatformConfig(partnerCode, null, IotPartnerConfig.class);
 //      设备平台注册 
-        String iotDeviceId = NbUtil.register(versionedDevice.getIotDevImei(), newConfig.getAppId(), newConfig.getAppSecret());
+        String iotDeviceId = iotPlatService.register(versionedDevice.getIotDevImei(), newConfig.getAppId(), newConfig.getAppSecret());
         //      重新绑定注册信息
         IotDeviceInfo updated = new IotDeviceInfo();
         updated.setId(versionedDevice.getId());
@@ -570,12 +600,12 @@ public class IotDevService implements CommonDeviceProvider{
             partnerService.queryPartnerPlatformConfig(
                 partnerCode, versionedDevice.getIotProtocolVersion(), IotPartnerConfig.class);
         //删除设备
-        NbUtil.deleteDevice(versionedDevice.getIotDevId(), config.getAppId(), config.getAppSecret());
+        iotPlatService.deleteDevice(versionedDevice.getIotDevId(), config.getAppId(), config.getAppSecret());
       //获取最新平台协议
         IotPartnerConfig newConfig = 
             partnerService.queryPartnerPlatformConfig(partnerCode, version, IotPartnerConfig.class);
 //      设备平台注册 
-        String iotDeviceId = NbUtil.register(versionedDevice.getIotDevImei(), newConfig.getAppId(), newConfig.getAppSecret());
+        String iotDeviceId = iotPlatService.register(versionedDevice.getIotDevImei(), newConfig.getAppId(), newConfig.getAppSecret());
         //      重新绑定注册信息
         IotDeviceInfo updated = new IotDeviceInfo();
         updated.setId(versionedDevice.getId());

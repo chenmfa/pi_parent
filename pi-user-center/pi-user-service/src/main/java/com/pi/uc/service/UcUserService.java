@@ -4,10 +4,10 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,7 @@ import com.pi.uc.dao.entity.UserEntity;
 import com.pi.uc.dao.mapper.UserMapper;
 import com.pi.uc.dao.param.UserParam;
 import com.pi.uc.model.user.UserPostForm;
+import com.pi.uc.model.userlogin.UserLoginPostForm;
 import com.pi.uc.model.wx.mini.WxMiniAuthInfo;
 import com.pi.uc.util.TokenUtil;
 
@@ -53,16 +54,13 @@ public class UcUserService {
   @Value("${server.ftp.parentFolder}")
   private String ftpParentFolder;
   
-  public String bindWeChat(
-      @NotNull(message="UC_USER.SOURCE_ID_EMPTY") Long sourceId, 
-      @NotNull(message="UC_USER.WECHAT_CODE_EMPTY") 
-      @Length(min=20, max=50, message="UC_USER.WECHAT_CODE_NOT_CORRECT") String wxCode) throws Exception{
+  public String bindWeChat(@Valid UserLoginPostForm userInfo) throws Exception{
     //查询app配置
-    PartnerAppConfig config = configService.queryPartnerAppConfig(sourceId);
+    PartnerAppConfig config = configService.queryPartnerAppConfig(userInfo.getSourceId());
     //校验授权
-    WxMiniAuthInfo wxUserInfo = validWxAuthorization(wxCode, config);
+    WxMiniAuthInfo wxUserInfo = validWxAuthorization(userInfo.getWxCode(), config);
     //获取用户信息
-    UserEntity entity = createIfNotExistUser(wxUserInfo, sourceId);
+    UserEntity entity = createIfNotExistUser(wxUserInfo, userInfo);
     //保存登录会话
     String token  = TokenUtil.getUserToken(entity);
     return token;
@@ -80,7 +78,7 @@ public class UcUserService {
     return url;
   }
   
-  public void updateUserInfo(UserPostForm form){
+  public void updateUserInfo(@Valid UserPostForm form){
     UserEntity entity = queryUserInfo(form.getLoginUserId());
     entity.setAge(form.getAge());
     entity.setMobile(form.getMobile());
@@ -126,7 +124,7 @@ public class UcUserService {
     return url;
   }
   
-  private UserEntity createIfNotExistUser(WxMiniAuthInfo wxUserInfo, long sourceId) {
+  private UserEntity createIfNotExistUser(WxMiniAuthInfo wxUserInfo, UserLoginPostForm user) {
     UserParam param = new UserParam();
     param.setWxOpenid(wxUserInfo.getOpenid());
     if(StringUtils.isNotBlank(wxUserInfo.getUinionid())){
@@ -139,26 +137,35 @@ public class UcUserService {
     UserEntity entity;
     if(null != userList && !userList.isEmpty()){
       entity = userList.get(0);
+      if((user.getGender() != entity.getSex() 
+          && user.getGender()>0 && user.getGender()<3)){
+        entity.setSex(user.getGender());
+      }
+      if(StringUtils.isNotBlank(user.getAvatarUrl()) 
+          && entity.getAvatar().equals(user.getAvatarUrl())){
+        entity.setAvatar(user.getAvatarUrl());
+      }
       userMapper.updateById(entity);
     }else{
-      entity = translateWxUserInfoToEntity(wxUserInfo);
-      entity.setSourceId(sourceId);
+      entity = translateWxUserInfoToEntity(wxUserInfo, user);
+      entity.setSourceId(user.getSourceId());
       userMapper.insert(entity);      
     }
     return entity;
   }
   
-  private UserEntity translateWxUserInfoToEntity(WxMiniAuthInfo wxUserInfo){
+  private UserEntity translateWxUserInfoToEntity(WxMiniAuthInfo wxUserInfo, UserLoginPostForm user){
     UserEntity entity = new UserEntity();
     entity.setAge(0);
-    entity.setSex(1);
+    entity.setSex((user.getGender()>0 && user.getGender()<3)? 
+        user.getGender():1);
     entity.setMobile("");
     entity.setName("");
-    entity.setNickName("");
+    entity.setNickName(null != user.getNickName()?user.getNickName():"");
     entity.setPassword("");    
     entity.setState(RecordState.STATE_NORMAL.getCode());
     entity.setWxOpenid(wxUserInfo.getOpenid());
-    entity.setAvatar("");
+    entity.setAvatar(null != user.getAvatarUrl() ? user.getAvatarUrl():"");
     entity.setEducation("");
     entity.setWxUnionid(wxUserInfo.getUinionid());
     return entity;

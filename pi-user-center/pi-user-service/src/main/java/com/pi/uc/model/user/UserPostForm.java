@@ -62,4 +62,9 @@ public class UserPostForm {
   public void setEducation(String education) {
     this.education = education;
   }
+  @Override
+  public String toString() {
+    return "UserPostForm [loginUserId=" + loginUserId + ", sex=" + sex + ", mobile=" + mobile + ", age=" + age
+        + ", name=" + name + ", education=" + education + "]";
+  }
 }

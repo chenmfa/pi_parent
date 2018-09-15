@@ -1,4 +1,4 @@
-package com.pi.nbcenter.device.service.base;
+package com.pi.nbcenter.device.service.partner;
 
 import java.util.HashMap;
 import java.util.List;

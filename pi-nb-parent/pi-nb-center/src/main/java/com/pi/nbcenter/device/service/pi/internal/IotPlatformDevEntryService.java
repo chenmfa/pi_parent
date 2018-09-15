@@ -1,4 +1,4 @@
-package com.pi.nbcenter.device.service.base;
+package com.pi.nbcenter.device.service.pi.internal;
 
 import java.util.Calendar;
 

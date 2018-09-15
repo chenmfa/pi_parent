@@ -1,6 +1,6 @@
 package nbcenter.test;
 
-import com.pi.nbcenter.util.nb.NbUtil;
+import com.pi.nbcenter.util.nb.HuaWeiIotService;
 
 public class NbUtilTest {
  public static void main(String[] args) throws Exception {

@@ -1,4 +1,4 @@
-package com.pi.nbcenter.device.service.base;
+package com.pi.nbcenter.device.service.partner;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -21,7 +21,7 @@ import com.pi.nbcenter.device.entity.auto.BasePartnerSubscription;
 import com.pi.nbcenter.device.entity.auto.BasePartnerSubscriptionExample;
 import com.pi.nbcenter.device.entity.auto.IotDeviceInfo;
 import com.pi.nbcenter.device.mapper.auto.BasePartnerSubscriptionMapper;
-import com.pi.nbcenter.device.service.iot.IotDevService;
+import com.pi.nbcenter.device.service.pi.internal.PiIotDevService;
 import com.pi.nbcenter.util.comm.ObjectUtil;
 
 @Service
@@ -30,7 +30,7 @@ public class BasePartnerSubscriptionService {
   @Autowired
   private BasePartnerSubscriptionMapper subscriptionMapper;
   @Autowired
-  private IotDevService devService;
+  private PiIotDevService devService;
 //  @Autowired
 //  private HttpClientUtil httpClientUtil;
   

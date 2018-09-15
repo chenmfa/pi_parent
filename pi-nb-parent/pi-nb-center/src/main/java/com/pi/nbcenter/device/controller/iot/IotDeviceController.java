@@ -28,18 +28,18 @@ import com.pi.nbcenter.device.bean.dto.nb.IotDeviceInfoDTO;
 import com.pi.nbcenter.device.bean.dto.session.IotSession;
 import com.pi.nbcenter.device.controller.iot.facade.DeviceCallBackFacade;
 import com.pi.nbcenter.device.entity.auto.IotDeviceSession;
-import com.pi.nbcenter.device.service.CommonDeviceService;
-import com.pi.nbcenter.device.service.base.BasePartnerSubscriptionService;
-import com.pi.nbcenter.device.service.iot.IotDevService;
+import com.pi.nbcenter.device.service.partner.BasePartnerSubscriptionService;
+import com.pi.nbcenter.device.service.pi.external.PiGlobalDeviceService;
+import com.pi.nbcenter.device.service.pi.internal.PiIotDevService;
 
 @RequestMapping("/device")
 @RestController
 public class IotDeviceController {
   private static final Logger logger = LoggerFactory.getLogger(IotDeviceController.class);
   @Autowired
-  private IotDevService iotDevService;
+  private PiIotDevService iotDevService;
   @Autowired
-  private CommonDeviceService commonDeviceService;
+  private PiGlobalDeviceService commonDeviceService;
   @Autowired
   private DeviceCallBackFacade deviceCallBackFacade;
   @Autowired

@@ -70,6 +70,13 @@ public class StroopInvitationService {
     return getWxMiniQrcode(accessToken, loginUserId);
   }
   
+  public List<StroopInvitationEntity> queryUserInvitation(
+      @NotNull(message="UC_USER.USER_ID_EMPTY") Long userId){
+    StroopInvitationParam param = new StroopInvitationParam();
+    param.setInviterId(userId);
+    return invitationMapper.findList(param);
+  }
+  
   private List<StroopInvitationEntity> getInvitationInfo(Long loginUserId){
     StroopInvitationParam param = new StroopInvitationParam();
     param.setUserId(loginUserId);

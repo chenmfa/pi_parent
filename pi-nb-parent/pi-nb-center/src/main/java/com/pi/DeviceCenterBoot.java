@@ -26,10 +26,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.pi.nbcenter.base.consistency.SpringContextHolder;
 import com.pi.nbcenter.base.listener.BootInitializeListener;
-import com.pi.nbcenter.device.service.base.BasePlatFormService;
+import com.pi.nbcenter.device.service.partner.BasePlatFormService;
 import com.pi.nbcenter.util.nb.Constant;
-import com.pi.nbcenter.util.nb.NbUtil;
+import com.pi.nbcenter.util.nb.HuaWeiIotService;
 
 /**
  * @description Nb基础模块 启动页, 负责nb模块的初始注册
@@ -141,8 +142,11 @@ public class DeviceCenterBoot {
         Map<String, String> config = entry.getValue();
         if(null != config && config.containsKey("appId") 
             && config.containsKey("appSecret")){
-          logger.info("开启订阅：",NbUtil.subscribe(config.get("appId"), config.get("appSecret")));
-          logger.info("服务器地址：{}, appId: {}, aapSecret:{},", Constant.BASE_URL, config.get("appId"), config.get("appSecret"));
+          logger.info("开启订阅：", 
+              SpringContextHolder.getBean(HuaWeiIotService.class)
+              .subscribe(config.get("appId"), config.get("appSecret")));
+          logger.info("服务器地址：{}, appId: {}, aapSecret:{},", 
+              Constant.BASE_URL, config.get("appId"), config.get("appSecret"));
         }
       }
     }

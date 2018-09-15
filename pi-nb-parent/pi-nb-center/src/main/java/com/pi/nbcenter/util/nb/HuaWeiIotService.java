@@ -6,16 +6,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.pi.base.dto.result.AppResult;
+import com.pi.base.exception.ServiceException;
+import com.pi.base.util.lang.LongUtil;
 import com.pi.nbcenter.device.bean.dto.nb.IotDeviceInfoDTO;
 import com.pi.nbcenter.device.bean.dto.partner.IotPartnerConfig;
 
@@ -24,23 +33,26 @@ import com.pi.nbcenter.device.bean.dto.partner.IotPartnerConfig;
  * @author chenmfa
  *
  */
-public class NbUtil {
-	private static final Logger logger = LoggerFactory.getLogger(NbUtil.class);
+@Validated
+@Service
+public class HuaWeiIotService {
+	private static final Logger logger = LoggerFactory.getLogger(HuaWeiIotService.class);
 	
   public static void main(String[] args) throws Exception {
+    HuaWeiIotService nbUtil = new HuaWeiIotService();
 //		openLock("937b99e4-d580-451e-8b47-d9e26bfab50f","ge/ad8XT1takmr4STDqV5A==");
 //		subscribe();
 //		setCert("c2ecabb6-ac0f-445f-a2c1-5e9f543811f1", 1032893737,"ge/ad8XT1takmr4STDqV5A==");
 //	  AppResult deviceInfo = getDeviceInfo("f89ffcc5-3c13-43c3-8216-fc20af9609e3", "aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
 //	  System.out.println(JSON.toJSONString(deviceInfo));
-	  queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "yEADskbTvrU0WjI1B1xIqQ9oVLAa", "7FbZDkKhbGQt3rWdRaJ7tuKzmHsa");
+    nbUtil.queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "yEADskbTvrU0WjI1B1xIqQ9oVLAa", "7FbZDkKhbGQt3rWdRaJ7tuKzmHsa");
 //	  queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "MSFPRiVvRpW9Li7OV0UJehG7AIUa", "JdMW2WfIfuvz4PqkC1g8tjAqYcga");
 //	  queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
 //	  deleteDevice("872feba2-f54f-4c36-848a-012ab6949c31", "aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
 //    register("865352031693699","aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
 //    deleteDevice("ff5ee954-d35d-4a6e-8567-56da21c591b8","aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
 	}
-  public static AppResult queryDevies(String deviceId, String appId, String appSecret) throws Exception{
+  public AppResult queryDevies(String deviceId, String appId, String appSecret) throws Exception{
     HttpsUtil httpsUtil = initializeHttpClient();
     String urlDelete = Constant.DELETE_DEVICE + "/" +deviceId+"?appId="+ appId + "&cascade=false";
   //获取服务器的token
@@ -63,7 +75,7 @@ public class NbUtil {
     }
   }
   
-	public static AppResult deleteDevice(
+	public AppResult deleteDevice(
 	    String deviceId, String appId, String appSecret) throws Exception{
 		HttpsUtil httpsUtil = initializeHttpClient();
 		String urlDelete = Constant.DELETE_DEVICE + "/" +deviceId+"?appId="+ appId + "&cascade=false";
@@ -86,7 +98,7 @@ public class NbUtil {
 		  }
 		}
 	}
-	public static AppResult getDeviceInfo(
+	public AppResult getDeviceInfo(
 	    String deviceId, String appId, String appSecret) throws Exception{
 	  HttpsUtil httpsUtil = initializeHttpClient();
 	  String queryInfo = Constant.QUERY_DEVICES + "/" +deviceId+"?appId="+ appId;
@@ -111,7 +123,7 @@ public class NbUtil {
     }
 	}
 	
-	public static void queryGateway(String gateway, String appId, String appSecret) throws Exception{
+	public void queryGateway(String gateway, String appId, String appSecret) throws Exception{
 	  HttpsUtil httpsUtil = initializeHttpClient();
     String queryInfo = Constant.QUERY_DEVICES + "?appId="+ appId+"&deviceType=DoorLock&pageNo=0&pageSize=100";
     String accessToken = takeToken(httpsUtil, appId, appSecret);
@@ -122,7 +134,7 @@ public class NbUtil {
     System.out.println(deviceInfoStr);
 	}
 	
-	public static boolean updateDevice(
+	public boolean updateDevice(
 	    String deviceId, String name, IotPartnerConfig config) throws Exception{
     HttpsUtil httpsUtil = initializeHttpClient();
     String urlModify = Constant.MODIFY_DEVICE_INFO + "/" +deviceId+"?appId="+ config.getAppId();
@@ -150,13 +162,11 @@ public class NbUtil {
     }
   }
 	
-	public static String setCert(
+	public String setCert(
 	    String deviceId, Integer regCode, String identityCode,
 	    String appId, String appSecret) throws Exception{
     String serviceId = "Lock";
     String method = "SET_CERT";
-    
-    
     ObjectNode paras = JsonUtil.convertObject2ObjectNode("{\"identityCode\":\"" + identityCode + "\",\"regCode\":"+regCode+",\"regTime\":"+(System.currentTimeMillis()/1000)+"}");
   
     Map<String, Object> paramCommand = new HashMap<>();
@@ -170,7 +180,58 @@ public class NbUtil {
     return sendCommand(paramCommand, paramPostAsynCmd, appId, appSecret);
 	}
 	
-	public static String openLock(
+	public String sendIcCard(
+      @NotNull(message = "NB_UTITY.IC_CARD_DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.IC_CARD_USER_NOT_EMPTY") Long userId, 
+      @NotBlank(message = "NB_UTITY.IC_CARD_IS_EMPTY") 
+      @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String icCard,
+      String appId, String appSecret) throws Exception{
+	  return operateIcCard(deviceId, userId, icCard, (byte)0x04 , appId, appSecret);
+	}
+	public String deleteIcCard(
+      @NotNull(message = "NB_UTITY.IC_CARD_DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.IC_CARD_USER_NOT_EMPTY") Long userId, 
+      @NotBlank(message = "NB_UTITY.IC_CARD_IS_EMPTY") 
+      @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String icCard,
+      String appId, String appSecret) throws Exception{
+	  return operateIcCard(deviceId, userId, icCard, (byte)0x05, appId, appSecret);
+	}
+	
+	private String operateIcCard(
+	    @NotNull(message = "NB_UTITY.IC_CARD_DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.IC_CARD_USER_NOT_EMPTY") Long userId, 
+      @NotBlank(message = "NB_UTITY.IC_CARD_IS_EMPTY") 
+      @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String idCard,
+      byte ins, String appId, String appSecret) throws Exception{
+	  if(ins != 0x04 && ins != 0x05){
+	    throw new ServiceException("NB_UTITY.IC_CARD_INS_NOT_CORRECT");
+	  }
+    String serviceId = "Transmission";
+    String method = "RAW_DATA";
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] rawData = new byte[19];
+    rawData[0] = 0x04;
+    if(idCard.length() < 10){
+      idCard = StringUtils.leftPad(idCard, 10);
+    }
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    System.arraycopy(idCard.getBytes(), 0, rawData, 9, 10);
+    JSONObject param = new JSONObject();
+    param.put("length", "19");
+    param.put("rawData", Base64.encodeBase64(rawData));
+    
+    Map<String, Object> paramCommand = new HashMap<>();
+    paramCommand.put("serviceId", serviceId);
+    paramCommand.put("method", method);
+    paramCommand.put("paras", param.toString());      
+    
+    Map<String, Object> paramPostAsynCmd = new HashMap<>();
+    paramPostAsynCmd.put("deviceId", deviceId);
+    paramPostAsynCmd.put("command", paramCommand);
+    return sendCommand(paramCommand, paramPostAsynCmd, appId, appSecret);
+  }
+	
+	public String openLock(
 	    String deviceId, String identityCode,
 	    String appId, String appSecret) throws Exception{
     //设备ID
@@ -189,7 +250,7 @@ public class NbUtil {
     paramPostAsynCmd.put("command", paramCommand);
     return sendCommand(paramCommand, paramPostAsynCmd, appId, appSecret);
 	}
-	public static String sendCommand(
+	public String sendCommand(
 	    Map<String, Object> paramCommand,
 	    Map<String, Object> paramPostAsynCmd,
 	    String appId,
@@ -210,7 +271,7 @@ public class NbUtil {
     return doPost(httpsUtil, urlPostAsynCmd, jsonRequest, getHeaderMap(accessToken,appId));
 	}
 	
-	public static List<String> subscribe(String appId, String appSecret) throws Exception{
+	public List<String> subscribe(String appId, String appSecret) throws Exception{
 		List<String> notifyResult = new LinkedList<String>();
 		//Two-Way Authentication
     HttpsUtil httpsUtil = new HttpsUtil();
@@ -246,7 +307,7 @@ public class NbUtil {
     return notifyResult;
 	}
 	
-	public static void unSubScribe(String appId, String appSecret) throws Exception{
+	public void unSubScribe(String appId, String appSecret) throws Exception{
 	  HttpsUtil httpsUtil = new HttpsUtil();
     httpsUtil.initSSLConfigForTwoWay();
     String accessToken = takeToken(httpsUtil,appId,appSecret);
@@ -264,7 +325,7 @@ public class NbUtil {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static String register(String verifyCode, String appId, String appSecret) throws Exception{
+	public String register(String verifyCode, String appId, String appSecret) throws Exception{
 		// Two-Way Authentication
     HttpsUtil httpsUtil = new HttpsUtil();
     httpsUtil.initSSLConfigForTwoWay();
@@ -306,7 +367,7 @@ public class NbUtil {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-  public static String takeToken(HttpsUtil httpsUtil, String appId, String appSecret) throws Exception {
+  public String takeToken(HttpsUtil httpsUtil, String appId, String appSecret) throws Exception {
 
       String urlLogin = Constant.APP_AUTH;
       Map<String, String> paramLogin = new HashMap<>();
@@ -323,14 +384,14 @@ public class NbUtil {
       return data.get("accessToken");
   }
 	
-	public static Map<String, String> getHeaderMap(String accessToken, String appId){
+	public Map<String, String> getHeaderMap(String accessToken, String appId){
 		Map<String, String> header = new HashMap<>();
     header.put(Constant.HEADER_APP_KEY, appId);
     header.put(Constant.HEADER_APP_AUTH, "Bearer" + " " + accessToken);
     return header;
 	}
 	
-	public static HttpsUtil initializeHttpClient() throws Exception{
+	public HttpsUtil initializeHttpClient() throws Exception{
     HttpsUtil httpsUtil = new HttpsUtil();
     httpsUtil.initSSLConfigForTwoWay();
     return httpsUtil;
@@ -346,7 +407,7 @@ public class NbUtil {
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
 	 */
-	public static String doPost(
+	public String doPost(
 			HttpsUtil httpsUtil,String urlPostAsynCmd,
 			String jsonRequest,Map<String, String> header)
 					throws UnsupportedOperationException, IOException{
@@ -363,7 +424,7 @@ public class NbUtil {
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
 	 */
-	public static String doPost(
+	public String doPost(
 			HttpsUtil httpsUtil,String urlPostAsynCmd,
 			String jsonRequest,Map<String, String> header, String expectedStatus)
 					throws UnsupportedOperationException, IOException{
