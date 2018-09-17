@@ -1,0 +1,8 @@
+**/output/
+**/target/
+**/.settings/
+**/.project
+**/.classpath
+**/.gitignore
+**/logs/
+hs_err_pid*

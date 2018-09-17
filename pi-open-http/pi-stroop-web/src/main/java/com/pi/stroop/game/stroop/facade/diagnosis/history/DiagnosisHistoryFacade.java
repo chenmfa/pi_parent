@@ -34,7 +34,7 @@ public class DiagnosisHistoryFacade {
     List<Long> userIds = new ArrayList<Long>(histories.size());
     for(StroopDiagnosisHistoryEntity entity:histories){
       userIds.add(entity.getUserId());
-    }
+    }HashMap
     List<UserEntity> users = userService.queryUserByIds(userIds);
     HashMap<Long, UserEntity> userMap = users.stream().collect(
         Collectors.toMap(UserEntity::getId, Function.identity(), 
