@@ -1,4 +1,4 @@
-package com.pi.stroop.game.stroop;
+package com.pi.stroop.game.stroop.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

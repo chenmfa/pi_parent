@@ -93,6 +93,13 @@ public class UcUserService {
     }
   }
   
+  public List<UserEntity> queryUserByIds(List<Long> ids){
+    if(null == ids || ids.isEmpty()){
+      return null;
+    }
+    return userMapper.getByIds(ids);
+  }
+  
   public UserEntity queryUserInfo(@NotNull(message="UC_USER.USER_ID_EMPTY") Long userId){
     UserEntity entity = userMapper.findOne(userId);
     if(null == entity){

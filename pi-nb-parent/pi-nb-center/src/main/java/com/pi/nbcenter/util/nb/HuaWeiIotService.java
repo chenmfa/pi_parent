@@ -23,8 +23,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.pi.base.dto.result.AppResult;
-import com.pi.base.exception.ServiceException;
 import com.pi.base.util.lang.LongUtil;
+import com.pi.base.util.lang.ShortUtil;
+import com.pi.nbcenter.base.constants.pi.PiInsEnum;
 import com.pi.nbcenter.device.bean.dto.nb.IotDeviceInfoDTO;
 import com.pi.nbcenter.device.bean.dto.partner.IotPartnerConfig;
 
@@ -37,15 +38,24 @@ import com.pi.nbcenter.device.bean.dto.partner.IotPartnerConfig;
 @Service
 public class HuaWeiIotService {
 	private static final Logger logger = LoggerFactory.getLogger(HuaWeiIotService.class);
-	
+	private static final String APP_ID_TEST = "aGZa0RgUs7f0RZea2BzA7TkWLzAa";
+	private static final String APP_SEC_TEST = "no_bMvHqtkxEndF2JfYuRvIB3z4a";
+	private static final String DEV_ID_TEST = "2c3d1db7-be48-449c-b111-0a748056e829";
+	private static final String ICCARD_ID_TEST = "1234567890";
+	private static final Long USER_ID_TEST = 172228200829554688L;
   public static void main(String[] args) throws Exception {
+    System.out.println(Base64.decodeBase64("BAJj4KLawBAAMTIzNDU2Nzg5MA==").length);
     HuaWeiIotService nbUtil = new HuaWeiIotService();
+    nbUtil.setCert(DEV_ID_TEST, 1431557241, "ge/ad8XT1takmr4STDqV5A==",
+        APP_ID_TEST, APP_SEC_TEST);
+    nbUtil.sendUserIcCard(DEV_ID_TEST, USER_ID_TEST, ICCARD_ID_TEST, APP_ID_TEST, APP_SEC_TEST);
+//    nbUtil.addUserFinger(DEV_ID_TEST, USER_ID_TEST, APP_ID_TEST, APP_SEC_TEST);
 //		openLock("937b99e4-d580-451e-8b47-d9e26bfab50f","ge/ad8XT1takmr4STDqV5A==");
 //		subscribe();
 //		setCert("c2ecabb6-ac0f-445f-a2c1-5e9f543811f1", 1032893737,"ge/ad8XT1takmr4STDqV5A==");
-//	  AppResult deviceInfo = getDeviceInfo("f89ffcc5-3c13-43c3-8216-fc20af9609e3", "aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
-//	  System.out.println(JSON.toJSONString(deviceInfo));
-    nbUtil.queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "yEADskbTvrU0WjI1B1xIqQ9oVLAa", "7FbZDkKhbGQt3rWdRaJ7tuKzmHsa");
+	  AppResult deviceInfo = nbUtil.getDeviceInfo(DEV_ID_TEST, APP_ID_TEST, APP_SEC_TEST);
+	  System.out.println(JSON.toJSONString(deviceInfo));
+//    nbUtil.queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "yEADskbTvrU0WjI1B1xIqQ9oVLAa", "7FbZDkKhbGQt3rWdRaJ7tuKzmHsa");
 //	  queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "MSFPRiVvRpW9Li7OV0UJehG7AIUa", "JdMW2WfIfuvz4PqkC1g8tjAqYcga");
 //	  queryGateway("f514aa2a-b848-4e8d-906d-2b7da67b4b28", "aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
 //	  deleteDevice("872feba2-f54f-4c36-848a-012ab6949c31", "aGZa0RgUs7f0RZea2BzA7TkWLzAa", "no_bMvHqtkxEndF2JfYuRvIB3z4a");
@@ -177,49 +187,63 @@ public class HuaWeiIotService {
     Map<String, Object> paramPostAsynCmd = new HashMap<>();
     paramPostAsynCmd.put("deviceId", deviceId);
     paramPostAsynCmd.put("command", paramCommand);
-    return sendCommand(paramCommand, paramPostAsynCmd, appId, appSecret);
+    return sendCommand(paramPostAsynCmd, appId, appSecret);
 	}
 	
-	public String sendIcCard(
-      @NotNull(message = "NB_UTITY.IC_CARD_DEVICE_ID_EMPTY") String deviceId, 
-      @NotNull(message = "NB_UTITY.IC_CARD_USER_NOT_EMPTY") Long userId, 
+	public String sendUserIcCard(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId, 
       @NotBlank(message = "NB_UTITY.IC_CARD_IS_EMPTY") 
       @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String icCard,
       String appId, String appSecret) throws Exception{
-	  return operateIcCard(deviceId, userId, icCard, (byte)0x04 , appId, appSecret);
+	  return operateIcCard(deviceId, userId, icCard, PiInsEnum.ICCARD_ADD , appId, appSecret);
 	}
-	public String deleteIcCard(
-      @NotNull(message = "NB_UTITY.IC_CARD_DEVICE_ID_EMPTY") String deviceId, 
-      @NotNull(message = "NB_UTITY.IC_CARD_USER_NOT_EMPTY") Long userId, 
+	public String deleteUserIcCard(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId, 
       @NotBlank(message = "NB_UTITY.IC_CARD_IS_EMPTY") 
       @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String icCard,
       String appId, String appSecret) throws Exception{
-	  return operateIcCard(deviceId, userId, icCard, (byte)0x05, appId, appSecret);
+	  return operateIcCard(deviceId, userId, icCard, PiInsEnum.ICCARD_DEL, appId, appSecret);
 	}
+	public String deleteAllUserIcCard(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,
+      String appId, String appSecret) throws Exception{
+    return operateIcCard(deviceId, userId, null , PiInsEnum.ICCARD_DEL, appId, appSecret);
+  }
 	
 	private String operateIcCard(
-	    @NotNull(message = "NB_UTITY.IC_CARD_DEVICE_ID_EMPTY") String deviceId, 
-      @NotNull(message = "NB_UTITY.IC_CARD_USER_NOT_EMPTY") Long userId, 
-      @NotBlank(message = "NB_UTITY.IC_CARD_IS_EMPTY") 
-      @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String idCard,
-      byte ins, String appId, String appSecret) throws Exception{
-	  if(ins != 0x04 && ins != 0x05){
-	    throw new ServiceException("NB_UTITY.IC_CARD_INS_NOT_CORRECT");
-	  }
+	    @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId,
+	    @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,
+	    @Length(max=10, message = "NB_UTITY.IC_CARD_OVER_MAX") String icCard,
+	    @NotNull(message="NB_UTITY.IC_CARD_INS_NOT_CORRECT") PiInsEnum ins,
+	    String appId, String appSecret) throws Exception{
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] rawData = new byte[(null != icCard? icCard.length() : 0)+ 9];
+    rawData[0] = ins.getIns();
+
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    if(null != icCard && icCard.length()>0){
+      if(icCard.length() < 10){
+        icCard = StringUtils.leftPad(icCard, 10);
+      }
+      System.arraycopy(icCard.getBytes(), 0, rawData, 9, 10);
+    }
+    JSONObject param = new JSONObject();
+    param.put("length", rawData.length);
+    param.put("rawData", Base64.encodeBase64String(rawData));
+//    ObjectNode paras = JsonUtil.convertObject2ObjectNode("{\"length\":\"" + rawData.length + "\", \"rawData\":\"" + Base64.encodeBase64String(rawData)+ "\"}");
+    return insOperate(deviceId, param, appId, appSecret);
+	}
+	
+	private String insOperate(
+	    @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+	    @NotNull(message = "NB_UTITY.INS_PARAM_IS_EMPTY") JSONObject param,
+      String appId, String appSecret) throws Exception{
     String serviceId = "Transmission";
     String method = "RAW_DATA";
-    byte[] userIdArr = LongUtil.long2Bytes(userId);
-    byte[] rawData = new byte[19];
-    rawData[0] = 0x04;
-    if(idCard.length() < 10){
-      idCard = StringUtils.leftPad(idCard, 10);
-    }
-    System.arraycopy(userIdArr, 0, rawData, 1, 8);
-    System.arraycopy(idCard.getBytes(), 0, rawData, 9, 10);
-    JSONObject param = new JSONObject();
-    param.put("length", "19");
-    param.put("rawData", Base64.encodeBase64(rawData));
-    
+
     Map<String, Object> paramCommand = new HashMap<>();
     paramCommand.put("serviceId", serviceId);
     paramCommand.put("method", method);
@@ -228,8 +252,105 @@ public class HuaWeiIotService {
     Map<String, Object> paramPostAsynCmd = new HashMap<>();
     paramPostAsynCmd.put("deviceId", deviceId);
     paramPostAsynCmd.put("command", paramCommand);
-    return sendCommand(paramCommand, paramPostAsynCmd, appId, appSecret);
+    return sendCommand(paramPostAsynCmd, appId, appSecret);
   }
+	
+	public String addUserFinger(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,      
+      String appId, String appSecret) throws Exception{
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] rawData = new byte[9];
+    rawData[0] = PiInsEnum.FINGER_ADD_RISE.getIns();
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    JSONObject param = new JSONObject();
+    param.put("length", rawData.length);
+    param.put("rawData", Base64.encodeBase64(rawData));
+    return insOperate(deviceId, param, appId, appSecret);
+  }
+	
+	public String delUserFinger(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId, 
+      @NotBlank(message = "NB_UTITY.FINGER_ID_IS_EMPTY") 
+      @Length(min=0, max=32767, message = "NB_UTITY.FINGER_ID_OVER_MAX") short fingerId,
+      String appId, String appSecret) throws Exception{
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] fingerBytes = ShortUtil.shortToByte(fingerId);
+    byte[] rawData = new byte[11];
+    rawData[0] = PiInsEnum.FINGER_DEL.getIns();
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    System.arraycopy(fingerBytes, 0, rawData, 9, 10);
+    JSONObject param = new JSONObject();
+    param.put("length", rawData.length);
+    param.put("rawData", Base64.encodeBase64(rawData));
+    return insOperate(deviceId, param, appId, appSecret);
+  }
+	
+	public String delAllUserFinger(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,
+      String appId, String appSecret) throws Exception{
+    return executeNoContentIns(deviceId, userId, PiInsEnum.FINGER_DEL, appId, appSecret);
+  }
+	
+	public String addLocalUserPassword(
+	    @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId, 
+      String appId, String appSecret) throws Exception{
+	  return executeNoContentIns(deviceId, userId, PiInsEnum.PWD_ADD, appId, appSecret);
+	}
+	
+ public String addOnlineUserPassword(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,
+      @NotNull(message= "NB_UTITY.PASSWORD_IS_EMPTY")
+      @Length(max=10, message = "NB_UTITY.PASSWORD_OVER_MAX") String password,
+      String appId, String appSecret) throws Exception{
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] rawData = new byte[9 + password.length()];
+    rawData[0] = PiInsEnum.PWD_ADD.getIns();
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    System.arraycopy(password.getBytes(), 0, rawData, 9, password.length());
+    JSONObject param = new JSONObject();
+    param.put("length", rawData.length);
+    param.put("rawData", Base64.encodeBase64(rawData));
+    return executeNoContentIns(deviceId, userId, PiInsEnum.PWD_ADD, appId, appSecret);
+  }
+  public String delUserPassword(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,
+      @Length(min=0, max=32767, message = "NB_UTITY.FINGER_ID_OVER_MAX") short fingerId,
+      String appId, String appSecret) throws Exception{
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] fingerBytes = ShortUtil.shortToByte(fingerId);
+    byte[] rawData = new byte[11];
+    rawData[0] = PiInsEnum.FINGER_DEL.getIns();
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    System.arraycopy(fingerBytes, 0, rawData, 9, 10);
+    JSONObject param = new JSONObject();
+    param.put("length", rawData.length);
+    param.put("rawData", Base64.encodeBase64(rawData));
+    return insOperate(deviceId, param, appId, appSecret);
+  }
+  public String delAllUserPassword(
+      @NotNull(message = "NB_UTITY.DEVICE_ID_EMPTY") String deviceId, 
+      @NotNull(message = "NB_UTITY.USER_IS_EMPTY") Long userId,
+      String appId, String appSecret) throws Exception{
+     return executeNoContentIns(deviceId, userId, PiInsEnum.PWD_DEL, appId, appSecret);
+  }
+	private String executeNoContentIns(String deviceId, Long userId,
+	    @NotNull(message="NB_UTITY.INS_IS_EMPTY") PiInsEnum ins,
+	    String appId, String appSecret) throws Exception{
+    byte[] userIdArr = LongUtil.long2Bytes(userId);
+    byte[] rawData = new byte[9];
+    rawData[0] = ins.getIns();
+    System.arraycopy(userIdArr, 0, rawData, 1, 8);
+    JSONObject param = new JSONObject();
+    param.put("length", rawData.length);
+    param.put("rawData", Base64.encodeBase64(rawData));
+    return insOperate(deviceId, param, appId, appSecret);
+	}
 	
 	public String openLock(
 	    String deviceId, String identityCode,
@@ -248,10 +369,9 @@ public class HuaWeiIotService {
     Map<String, Object> paramPostAsynCmd = new HashMap<>();
     paramPostAsynCmd.put("deviceId", deviceId);
     paramPostAsynCmd.put("command", paramCommand);
-    return sendCommand(paramCommand, paramPostAsynCmd, appId, appSecret);
+    return sendCommand(paramPostAsynCmd, appId, appSecret);
 	}
 	public String sendCommand(
-	    Map<String, Object> paramCommand,
 	    Map<String, Object> paramPostAsynCmd,
 	    String appId,
 	    String appSecret) throws Exception {

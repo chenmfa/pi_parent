@@ -1,4 +1,4 @@
-package com.pi.stroop.game.stroop;
+package com.pi.stroop.game.stroop.controller;
 
 import java.util.List;
 
@@ -11,13 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pi.base.dto.result.AppResult;
 import com.pi.stroop.base.controller.BaseController;
 import com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity;
+import com.pi.stroop.game.stroop.facade.diagnosis.history.DiagnosisHistoryFacade;
+import com.pi.stroop.game.stroop.vo.diagnosis.history.DiagnosisBriefHistoryVo;
 import com.pi.stroop.service.StroopDiagnosisService;
 
 @RestController
 public class StroopController extends BaseController{
   
   @Autowired
-  StroopDiagnosisService diagnosisService;
+  private DiagnosisHistoryFacade historyFacade;
+  @Autowired
+  private StroopDiagnosisService diagnosisService;
   
   @PostMapping("/user/diagnosis")
   public AppResult postDiagnosisResult(){
@@ -28,7 +32,8 @@ public class StroopController extends BaseController{
   public AppResult getDiagnosisHistory(){
     List<StroopDiagnosisHistoryEntity> diagnosisList = 
         diagnosisService.queryUserDiagnosisHistory(getLoginUserId());
-    return AppResult.newSuccessResult(diagnosisList);
+    List<DiagnosisBriefHistoryVo> voList = historyFacade.transDiagnsisEntityToBrief(diagnosisList);
+    return AppResult.newSuccessResult(voList);
   }
   
   @RequestMapping("/user/diagnosis/detail")

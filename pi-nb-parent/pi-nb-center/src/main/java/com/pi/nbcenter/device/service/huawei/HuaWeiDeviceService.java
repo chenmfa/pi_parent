@@ -39,7 +39,7 @@ public class HuaWeiDeviceService implements CommonDeviceService,IcCardService{
             iotDevice.getIotProtocolVersion(), IotPartnerConfig.class);
     //查询ic卡是否已绑定
     
-    huaWeiPlatformService.sendIcCard(iotDevice.getIotDevId(), userId, icCard,
+    huaWeiPlatformService.sendUserIcCard(iotDevice.getIotDevId(), userId, icCard,
         partnerConfig.getAppId(), partnerConfig.getAppSecret());
     return null;
   }
@@ -57,7 +57,7 @@ public class HuaWeiDeviceService implements CommonDeviceService,IcCardService{
             iotDevice.getIotProtocolVersion(), IotPartnerConfig.class);
     //查询ic卡是否已绑定
     
-    huaWeiPlatformService.deleteIcCard(iotDevice.getIotDevId(), userId, icCard,
+    huaWeiPlatformService.deleteUserIcCard(iotDevice.getIotDevId(), userId, icCard,
         partnerConfig.getAppId(), partnerConfig.getAppSecret());
   }
 
