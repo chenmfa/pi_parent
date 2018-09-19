@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.pi.stroop.dao.mapper.StroopDiagnosisHistoryMapper">
+<mapper namespace="com.pi.stroop.dao.mapper.StroopTaskRecordMapper">
 	<sql id="all_columns">
-		id,create_date,update_date,version,user_id,invite_id,invite_user_id,diagnosis_info,diagnosis_result,diagnosis_score,diagnosis_level
+		id,create_date,update_date,version,diagnosis_id,task_id,task_start_time,task_result_param,task_correct_count,task_error_count,task_mis_count
 	</sql>
 	<sql id="updateSet">
-		<if test="userId != null ">,user_id=#{userId}</if>
-		<if test="inviteId != null ">,invite_id=#{inviteId}</if>
-		<if test="inviteUserId != null ">,invite_user_id=#{inviteUserId}</if>
-		<if test="diagnosisInfo != null ">,diagnosis_info=#{diagnosisInfo}</if>
-		<if test="diagnosisResult != null ">,diagnosis_result=#{diagnosisResult}</if>
-		<if test="diagnosisScore != null ">,diagnosis_score=#{diagnosisScore}</if>
-		<if test="diagnosisLevel != null ">,diagnosis_level=#{diagnosisLevel}</if>
+		<if test="diagnosisId != null ">,diagnosis_id=#{diagnosisId}</if>
+		<if test="taskId != null ">,task_id=#{taskId}</if>
+		<if test="taskStartTime != null ">,task_start_time=#{taskStartTime}</if>
+		<if test="taskResultParam != null ">,task_result_param=#{taskResultParam}</if>
+		<if test="taskCorrectCount != null ">,task_correct_count=#{taskCorrectCount}</if>
+		<if test="taskErrorCount != null ">,task_error_count=#{taskErrorCount}</if>
+		<if test="taskMisCount != null ">,task_mis_count=#{taskMisCount}</if>
 
 	</sql>
 	<sql id="where">
@@ -20,48 +20,48 @@
 			<if test="createDate != null ">and create_date=#{createDate}</if>
 			<if test="updateDate != null ">and update_date=#{updateDate}</if>
 			<if test="version != null ">and version=#{version}</if>
-			<if test="userId != null ">and user_id=#{userId}</if>
-			<if test="inviteId != null ">and invite_id=#{inviteId}</if>
-			<if test="inviteUserId != null ">and invite_user_id=#{inviteUserId}</if>
-			<if test="diagnosisInfo != null ">and diagnosis_info=#{diagnosisInfo}</if>
-			<if test="diagnosisResult != null ">and diagnosis_result=#{diagnosisResult}</if>
-			<if test="diagnosisScore != null ">and diagnosis_score=#{diagnosisScore}</if>
-			<if test="diagnosisLevel != null ">and diagnosis_level=#{diagnosisLevel}</if>
+			<if test="diagnosisId != null ">and diagnosis_id=#{diagnosisId}</if>
+			<if test="taskId != null ">and task_id=#{taskId}</if>
+			<if test="taskStartTime != null ">and task_start_time=#{taskStartTime}</if>
+			<if test="taskResultParam != null ">and task_result_param=#{taskResultParam}</if>
+			<if test="taskCorrectCount != null ">and task_correct_count=#{taskCorrectCount}</if>
+			<if test="taskErrorCount != null ">and task_error_count=#{taskErrorCount}</if>
+			<if test="taskMisCount != null ">and task_mis_count=#{taskMisCount}</if>
 			
 		</where>
 	</sql>
 	<sql id="table_name">
-		stroop_diagnosis_history
+		stroop_task_record
 	</sql>
 
-	<select id="findOne" resultType="StroopDiagnosisHistoryEntity">
+	<select id="findOne" resultType="StroopTaskRecordEntity">
 		select
 		<include refid="all_columns" />
 		from
 		<include refid="table_name" />
 		where id=#{id}
 	</select>
-  <select id="findAll" resultType="StroopDiagnosisHistoryEntity">
+  <select id="findAll" resultType="StroopTaskRecordEntity">
     SELECT
     <include refid="all_columns" />
     <include refid="table_name" /> limit 1000
   </select>
-  <select id="findList" resultType="StroopDiagnosisHistoryEntity">
+  <select id="findList" resultType="StroopTaskRecordEntity">
     select <include refid="all_columns" /> from <include refid="table_name" /> <include refid="where" />
   </select>
   
     
-	<update id="updateById" parameterType="com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity">
+	<update id="updateById" parameterType="com.pi.stroop.dao.entity.StroopTaskRecordEntity">
 		update <include refid="table_name" />
 		set version=version+1, update_date=now()  <include refid="updateSet" />
 		where ID=#{id} AND VERSION=#{version}
 	</update>
 	
 	
-	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity">
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="com.pi.stroop.dao.entity.StroopTaskRecordEntity">
 		insert into <include refid="table_name" />
 		(<include refid="all_columns" />)
-		values( NULL, now(), now(), 200,#{userId},#{inviteId},#{inviteUserId},#{diagnosisInfo},#{diagnosisResult},#{diagnosisScore},#{diagnosisLevel} )
+		values( NULL, now(), now(), 200,#{diagnosisId},#{taskId},#{taskStartTime},#{taskResultParam},#{taskCorrectCount},#{taskErrorCount},#{taskMisCount} )
 	</insert>
 
   <select id="count" resultType="long">
@@ -71,7 +71,7 @@
     SELECT count(1) FROM <include refid="table_name" />
     <include refid="where" />
   </select>	
-  <select id="getByIds" parameterType="list" resultType="StroopDiagnosisHistoryEntity">
+  <select id="getByIds" parameterType="list" resultType="StroopTaskRecordEntity">
     SELECT
     <include refid="all_columns" />
     FROM <include refid="table_name" />

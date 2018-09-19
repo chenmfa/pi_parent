@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pi.base.dto.result.AppResult;
 import com.pi.stroop.base.controller.BaseController;
-import com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity;
+import com.pi.stroop.dao.entity.StroopDiagnosisRecordEntity;
 import com.pi.stroop.game.stroop.facade.diagnosis.history.DiagnosisHistoryFacade;
 import com.pi.stroop.game.stroop.vo.diagnosis.history.DiagnosisBriefHistoryVo;
 import com.pi.stroop.service.StroopDiagnosisService;
@@ -30,7 +30,7 @@ public class StroopController extends BaseController{
  // r06i62qcuzwbi73awxbuy5r3rr1lbgfh
   @RequestMapping("/user/diagnosis/history")
   public AppResult getDiagnosisHistory(){
-    List<StroopDiagnosisHistoryEntity> diagnosisList = 
+    List<StroopDiagnosisRecordEntity> diagnosisList = 
         diagnosisService.queryUserDiagnosisHistory(getLoginUserId());
     List<DiagnosisBriefHistoryVo> voList = historyFacade.transDiagnsisEntityToBrief(diagnosisList);
     return AppResult.newSuccessResult(voList);

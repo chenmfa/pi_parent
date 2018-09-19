@@ -3,11 +3,11 @@ package com.pi.stroop.dao.entity;
 import com.pi.comm.entity.BaseEntity;
 
 /**
- * @description 表stroop_diagnosis_history的实体类
+ * @description 表stroop_diagnosis_record的实体类
  * @author chenmfa
- * @date 2018-09-06 14:27:42
+ * @date 2018-09-19 08:06:13
  */
-public class StroopDiagnosisHistoryEntity extends BaseEntity{
+public class StroopDiagnosisRecordEntity extends BaseEntity{
 	private static final long serialVersionUID = -4972683369271453960L;
 	private Long              userId;             // 测试用户序号 
 	private Long              inviteId;           // 测试用户推荐序号(用于绑定历史推荐人) 
@@ -16,6 +16,9 @@ public class StroopDiagnosisHistoryEntity extends BaseEntity{
 	private String            diagnosisResult;    // 反应时间数据 
 	private Integer           diagnosisScore;     // 分数 
 	private Integer           diagnosisLevel;     // 评级 
+	private Integer           diagnosisDelay;     // 响应延迟 
+	private Integer           diagnosisReactPeriod;// 反应时间 
+	private Integer           diagnosisCorrectInterference;// 正确数干扰量 
 
 	public Long getUserId() {
 		return this.userId;
@@ -71,6 +74,30 @@ public class StroopDiagnosisHistoryEntity extends BaseEntity{
 
 	public void setDiagnosisLevel(Integer diagnosisLevel) {
 		this.diagnosisLevel=diagnosisLevel;
+	}
+
+	public Integer getDiagnosisDelay() {
+		return this.diagnosisDelay;
+	}
+
+	public void setDiagnosisDelay(Integer diagnosisDelay) {
+		this.diagnosisDelay=diagnosisDelay;
+	}
+
+	public Integer getDiagnosisReactPeriod() {
+		return this.diagnosisReactPeriod;
+	}
+
+	public void setDiagnosisReactPeriod(Integer diagnosisReactPeriod) {
+		this.diagnosisReactPeriod=diagnosisReactPeriod;
+	}
+
+	public Integer getDiagnosisCorrectInterference() {
+		return this.diagnosisCorrectInterference;
+	}
+
+	public void setDiagnosisCorrectInterference(Integer diagnosisCorrectInterference) {
+		this.diagnosisCorrectInterference=diagnosisCorrectInterference;
 	}
 
 }

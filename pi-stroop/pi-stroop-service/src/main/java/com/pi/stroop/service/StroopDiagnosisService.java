@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.pi.stroop.dao.entity.StroopDiagnosisHistoryEntity;
+import com.pi.stroop.dao.entity.StroopDiagnosisRecordEntity;
 import com.pi.stroop.dao.entity.StroopInvitationEntity;
-import com.pi.stroop.dao.mapper.StroopDiagnosisHistoryMapper;
+import com.pi.stroop.dao.mapper.StroopDiagnosisRecordMapper;
 
 @Validated
 @Service
@@ -19,9 +19,9 @@ public class StroopDiagnosisService {
   @Autowired
   private StroopInvitationService invitationServce;
   @Autowired
-  private StroopDiagnosisHistoryMapper diagnosisHistoryService;
+  private StroopDiagnosisRecordMapper diagnosisHistoryService;
   
-  public List<StroopDiagnosisHistoryEntity> queryUserDiagnosisHistory(
+  public List<StroopDiagnosisRecordEntity> queryUserDiagnosisHistory(
       @NotNull(message="UC_USER.USER_ID_EMPTY") Long userId){
     //查询我的邀请记录
     List<StroopInvitationEntity> invitationList = invitationServce.queryUserInvitation(userId);
