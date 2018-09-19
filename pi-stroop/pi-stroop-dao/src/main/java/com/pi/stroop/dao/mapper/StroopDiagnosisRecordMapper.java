@@ -15,7 +15,7 @@ import com.pi.stroop.dao.entity.StroopDiagnosisRecordEntity;
  */
 public interface StroopDiagnosisRecordMapper extends BaseMapper<StroopDiagnosisRecordEntity, Long>{
   @Select({"<script>",
-    "SELECT * FROM `stroop_diagnosis_history` WHERE user_id = #{userId:BIGINT} ",
+    "SELECT * FROM `stroop_diagnosis_record` WHERE user_id = #{userId:BIGINT} ",
     "<if test='list != null and list.size()>0'>",
     "OR invite_id IN",
     " <foreach item='item' index='index' collection='list' ",

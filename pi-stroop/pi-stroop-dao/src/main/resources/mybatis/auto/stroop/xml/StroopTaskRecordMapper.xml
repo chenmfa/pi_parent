@@ -2,11 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.pi.stroop.dao.mapper.StroopTaskRecordMapper">
 	<sql id="all_columns">
-		id,create_date,update_date,version,diagnosis_id,task_id,task_start_time,task_result_param,task_correct_count,task_error_count,task_mis_count
+		id,create_date,update_date,version,diagnosis_id,task_id,task_user_id,task_start_time,task_result_param,task_correct_count,task_error_count,task_mis_count
 	</sql>
 	<sql id="updateSet">
 		<if test="diagnosisId != null ">,diagnosis_id=#{diagnosisId}</if>
 		<if test="taskId != null ">,task_id=#{taskId}</if>
+		<if test="taskUserId != null ">,task_user_id=#{taskUserId}</if>
 		<if test="taskStartTime != null ">,task_start_time=#{taskStartTime}</if>
 		<if test="taskResultParam != null ">,task_result_param=#{taskResultParam}</if>
 		<if test="taskCorrectCount != null ">,task_correct_count=#{taskCorrectCount}</if>
@@ -22,6 +23,7 @@
 			<if test="version != null ">and version=#{version}</if>
 			<if test="diagnosisId != null ">and diagnosis_id=#{diagnosisId}</if>
 			<if test="taskId != null ">and task_id=#{taskId}</if>
+			<if test="taskUserId != null ">and task_user_id=#{taskUserId}</if>
 			<if test="taskStartTime != null ">and task_start_time=#{taskStartTime}</if>
 			<if test="taskResultParam != null ">and task_result_param=#{taskResultParam}</if>
 			<if test="taskCorrectCount != null ">and task_correct_count=#{taskCorrectCount}</if>
@@ -61,7 +63,7 @@
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="com.pi.stroop.dao.entity.StroopTaskRecordEntity">
 		insert into <include refid="table_name" />
 		(<include refid="all_columns" />)
-		values( NULL, now(), now(), 200,#{diagnosisId},#{taskId},#{taskStartTime},#{taskResultParam},#{taskCorrectCount},#{taskErrorCount},#{taskMisCount} )
+		values( NULL, now(), now(), 200,#{diagnosisId},#{taskId},#{taskUserId},#{taskStartTime},#{taskResultParam},#{taskCorrectCount},#{taskErrorCount},#{taskMisCount} )
 	</insert>
 
   <select id="count" resultType="long">

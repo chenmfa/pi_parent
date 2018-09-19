@@ -13,6 +13,7 @@ import com.pi.stroop.base.controller.BaseController;
 import com.pi.stroop.dao.entity.StroopDiagnosisRecordEntity;
 import com.pi.stroop.game.stroop.facade.diagnosis.history.DiagnosisHistoryFacade;
 import com.pi.stroop.game.stroop.vo.diagnosis.history.DiagnosisBriefHistoryVo;
+import com.pi.stroop.model.diagnosis.DiagnosisResult;
 import com.pi.stroop.service.StroopDiagnosisService;
 
 @RestController
@@ -24,8 +25,10 @@ public class StroopController extends BaseController{
   private StroopDiagnosisService diagnosisService;
   
   @PostMapping("/user/diagnosis")
-  public AppResult postDiagnosisResult(){
-    return null;
+  public AppResult postDiagnosisResult(String diagnosisPeriod, Integer stage, Long start){
+    DiagnosisResult result = 
+        diagnosisService.uploadDiagnosisResult(getLoginUserId(), diagnosisPeriod, stage, start);
+    return AppResult.newSuccessResult(result);
   }
  // r06i62qcuzwbi73awxbuy5r3rr1lbgfh
   @RequestMapping("/user/diagnosis/history")
@@ -37,8 +40,9 @@ public class StroopController extends BaseController{
   }
   
   @RequestMapping("/user/diagnosis/detail")
-  public AppResult getDiagnosisDetail(){
-    return null;
+  public AppResult getDiagnosisDetail(Long diagnosisId){
+    DiagnosisResult detail = diagnosisService.queryDiagnosisDetail(diagnosisId);
+    return AppResult.newSuccessResult(detail);
   }
   
   @GetMapping("/user/diagnosis")

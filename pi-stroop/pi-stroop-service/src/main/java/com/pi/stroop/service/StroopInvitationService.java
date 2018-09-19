@@ -17,6 +17,7 @@ import com.pi.base.dto.result.respcode.stroop.StroopResp;
 import com.pi.base.enumerate.record.RecordState;
 import com.pi.base.enumerate.redis.RedisCacheEnum;
 import com.pi.base.exception.ServiceException;
+import com.pi.base.util.bean.ObjectTool;
 import com.pi.base.util.cache.RedisUtil;
 import com.pi.base.util.http.v2.HttpPostUtil;
 import com.pi.config.model.PartnerAppConfig;
@@ -75,6 +76,15 @@ public class StroopInvitationService {
     StroopInvitationParam param = new StroopInvitationParam();
     param.setInviterId(userId);
     return invitationMapper.findList(param);
+  }
+  
+  public StroopInvitationEntity queryUserInviter(
+      @NotNull(message="STROOP_INVITATION.USER_ID_IS_EMPTY")Long userId){
+    StroopInvitationParam param = new StroopInvitationParam();
+    param.setUserId(userId);
+    param.setInviteState(RecordState.STATE_NORMAL.getCode());
+    List<StroopInvitationEntity> list = invitationMapper.findList(param);
+    return ObjectTool.getOne(list);
   }
   
   private List<StroopInvitationEntity> getInvitationInfo(Long loginUserId){

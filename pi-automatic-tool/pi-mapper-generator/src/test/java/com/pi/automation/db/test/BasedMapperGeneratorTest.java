@@ -13,7 +13,7 @@ public class BasedMapperGeneratorTest {
 //		mapperGenerator.generate("stroop_db", "stroop_diagnosis_history", "com.pi.stroop.dao");
 //		mapperGenerator.generate("stroop_db", "base_partner_info", "com.pi.config.dao");
 //		mapperGenerator.generate("stroop_db", "base_partner_config", "com.pi.config.dao");
-	  mapperGenerator.generate("stroop_db", "stroop_diagnosis_record", "com.pi.stroop.dao");
+//	  mapperGenerator.generate("stroop_db", "stroop_diagnosis_record", "com.pi.stroop.dao");
 	  mapperGenerator.generate("stroop_db", "stroop_task_record", "com.pi.stroop.dao");
 	}
 }
